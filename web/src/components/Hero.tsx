@@ -6,7 +6,7 @@ export function Hero() {
           <div>
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
               AI Makeup Insight
-              <span className="block text-[--color-brand-600]">Beauty, intelligently personalized</span>
+              <span className="block text-xl sm:text-3xl text-[--color-brand-600]">Beauty, intelligently personalized</span>
             </h1>
             <p className="mt-4 text-base sm:text-lg text-gray-600 max-w-prose">
               Upload a selfie to detect makeup issues and receive tailored suggestions. Opt-in to share with the community gallery for inspiration.

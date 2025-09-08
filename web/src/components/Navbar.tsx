@@ -15,9 +15,30 @@ export function Navbar() {
           <span className="text-base font-semibold tracking-tight">AI Makeup Insight</span>
         </div>
         <nav className="hidden sm:flex items-center gap-5 text-sm text-gray-600" aria-label="Primary">
-          <a href="#features" className="hover:text-gray-900">Makeup Analysis</a>
-          <a href="#gallery" className="hover:text-gray-900">Discover</a>
-          <a href="#pricing" className="hover:text-gray-900">Makeup Tips</a>
+          <a
+            href="/"
+            className="hover:text-pink-500 transition-colors duration-200"
+          >
+            Home
+          </a>
+          <a
+            href="/makeup_analysis"
+            className="hover:text-pink-500 transition-colors duration-200"
+          >
+            Makeup Analysis
+          </a>
+          <a
+            href="/discover_makeup"
+            className="hover:text-pink-500 transition-colors duration-200"
+          >
+            Discover Makeup
+          </a>
+          <a
+            href="/makeup_tips"
+            className="hover:text-pink-500 transition-colors duration-200"
+          >
+            Makeup Tips
+          </a>
         </nav>
         <div className="hidden sm:flex items-center gap-3">
           <a className="btn-primary" href="/login">Sign in</a>
@@ -42,9 +63,10 @@ export function Navbar() {
       {open && (
         <div id="mobile-menu" className="sm:hidden border-t border-black/5 bg-white" role="dialog" aria-modal="true">
           <div className="container-pad py-4 flex flex-col gap-4 text-sm">
-            <a href="#features" onClick={close} className="hover:text-gray-900">Makeup Analysis</a>
-            <a href="#gallery" onClick={close} className="hover:text-gray-900">Discover</a>
-            <a href="#pricing" onClick={close} className="hover:text-gray-900">Makeup Tips</a>
+            <a href="/" onClick={close} className="hover:text-gray-900">Home</a>
+            <a href="/makeup_analysis" onClick={close} className="hover:text-gray-900">Makeup Analysis</a>
+            <a href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</a>
+            <a href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</a>
             <div className="pt-2 flex items-center gap-3">
               <a className="btn-primary" href="/login" onClick={close}>Sign in</a>
             </div>
