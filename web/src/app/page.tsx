@@ -4,7 +4,7 @@ import { PricingCTA } from "@/components/PricingCTA";
 
 export default function Home() {
   return (
-    <main>
+    <main role="main">
       <Hero />
       <Features />
       <PricingCTA />
