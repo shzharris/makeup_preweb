@@ -4,7 +4,9 @@ export function PricingGrid() {
       <div className="container-pad py-16">
         <div className="mb-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold">Pricing</h2>
-          <p className="mt-2 text-gray-600">Choose a plan that fits you. Cancel anytime.</p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Choose a plan that fits you. Cancel anytime.
+          </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* One-time */}

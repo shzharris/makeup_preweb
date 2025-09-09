@@ -37,10 +37,9 @@ export function Features() {
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-            <Sparkles className="w-4 h-4" />
-            <h2 className="text-sm font-medium">How It Works</h2>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold">
+            How It Works
+          </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Transform your makeup analysis experience in just three simple steps
           </p>
