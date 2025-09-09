@@ -33,10 +33,15 @@ export function Features() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-      <div className="container mx-auto px-4 py-16">
+    <div className="section-soft section-pad">
+      <div className="container mx-auto px-4 relative">
+        {/* Decorative blobs */}
+        <div className="pointer-events-none absolute -z-10 inset-0">
+          <div className="absolute -top-10 -left-10 w-56 h-56 rounded-full bg-[--brand-50] blur-2xl opacity-70" />
+          <div className="absolute -bottom-10 right-10 w-64 h-64 rounded-full bg-[--brand-100] blur-3xl opacity-60" />
+        </div>
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold">
             How It Works
           </h2>

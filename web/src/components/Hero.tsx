@@ -1,7 +1,7 @@
 export function Hero() {
   return (
-    <section className="gradient-hero">
-      <div className="container-pad py-16 sm:py-24">
+    <section className="gradient-hero section-pad">
+      <div className="container-pad">
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
           <div>
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
