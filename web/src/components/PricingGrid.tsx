@@ -1,4 +1,15 @@
+"use client";
+
+import { useState } from "react";
+
 export function PricingGrid() {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const isActive = (i: number) => hovered === i || (hovered === null && i === 1);
+  const base = "group rounded-xl border-2 border-transparent bg-white p-6 shadow-sm transition-all duration-300 flex flex-col focus-within:ring-2 focus-within:ring-[--color-brand-400]";
+  const hoverFx = "hover:border-[--color-brand-400] hover:shadow-xl hover:-translate-y-1";
+  const activeFx = "border-[--color-brand-400] shadow-xl -translate-y-1";
+  const card = (i: number) => `${base} ${hoverFx} ${isActive(i) ? activeFx : ''}`;
+
   return (
     <section id="pricing" className="section-accent section-pad">
       <div className="container-pad relative">
@@ -14,7 +25,11 @@ export function PricingGrid() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* One-time */}
-          <div className="group rounded-xl border-2 border-transparent hover:border-[--color-brand-400] bg-white p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1 focus-within:ring-2 focus-within:ring-[--color-brand-400]">
+          <div
+            className={card(0)}
+            onMouseEnter={() => setHovered(0)}
+            onMouseLeave={() => setHovered(null)}
+          >
             <h3 className="text-lg font-semibold">One-time</h3>
             <p className="text-sm text-gray-600 mt-1">Pay once. Use once.</p>
             <div className="mt-4 flex items-baseline gap-1">
@@ -25,8 +40,14 @@ export function PricingGrid() {
           </div>
 
           {/* Monthly (Most popular) */}
-          <div className="group rounded-xl border-2 border-transparent hover:border-[--color-brand-400] bg-white p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative flex flex-col hover:-translate-y-1 focus-within:ring-2 focus-within:ring-[--color-brand-400]">
-            <span className="absolute -top-3 left-4 rounded-full bg-[--brand-100] text-[--color-brand-600] text-xs px-3 py-1 border border-[--brand-200]">Most popular</span>
+          <div
+            className={`${card(1)} relative`}
+            onMouseEnter={() => setHovered(1)}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <span className="absolute -top-3 left-4 rounded-full bg-[--brand-100] text-[--color-brand-600] text-xs px-3 py-1 border border-[--brand-200]">
+              Most popular
+            </span>
             <h3 className="text-lg font-semibold">Monthly</h3>
             <p className="text-sm text-gray-600 mt-1">Unlimited access for 1 month.</p>
             <div className="mt-4 flex items-baseline gap-1">
@@ -37,7 +58,11 @@ export function PricingGrid() {
           </div>
 
           {/* 6 Months */}
-          <div className="group rounded-xl border-2 border-transparent hover:border-[--color-brand-400] bg-white p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1 focus-within:ring-2 focus-within:ring-[--color-brand-400]">
+          <div
+            className={card(2)}
+            onMouseEnter={() => setHovered(2)}
+            onMouseLeave={() => setHovered(null)}
+          >
             <h3 className="text-lg font-semibold">6 Months</h3>
             <p className="text-sm text-gray-600 mt-1">Best value for half-year access.</p>
             <div className="mt-4 flex items-baseline gap-1">

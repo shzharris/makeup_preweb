@@ -33,12 +33,12 @@ export function Navbar() {
           >
             Discover Makeup
           </a>
-          <a
+          {/* <a
             href="/makeup_tips"
             className="hover:text-pink-500 transition-colors duration-200"
           >
             Makeup Tips
-          </a>
+          </a> */}
         </nav>
         <div className="hidden sm:flex items-center gap-3">
           <a className="btn-primary" href="/login">Sign in</a>
