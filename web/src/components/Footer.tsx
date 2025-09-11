@@ -48,14 +48,14 @@ export function Footer() {
               </div>
               <div>
                 <h3 className="text-xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                  AI Makeup Insight
+                  Makeup Insight AI
                 </h3>
-                <p className="text-sm text-pink-600">Beauty & AI</p>
               </div>
             </div>
             
             <p className="text-muted-foreground text-sm leading-relaxed">
-              ✨ Professional AI beauty enhancement platform that brings out the best in every photo. We use advanced artificial intelligence technology to provide personalized makeup solutions.
+            Beauty, intelligently personalized.<br/>
+            Upload a selfie to detect makeup issues and receive tailored suggestions. Opt-in to share with the community gallery for inspiration.
             </p>
 
             {/* Social Media */}

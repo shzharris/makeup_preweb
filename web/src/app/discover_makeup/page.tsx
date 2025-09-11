@@ -385,3 +385,7 @@ export function BeautyGallery() {
 export default function Page() {
   return <BeautyGallery />;
 }
+
+export default function Page() {
+  return <BeautyGallery />;
+}
