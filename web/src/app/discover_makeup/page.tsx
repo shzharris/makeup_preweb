@@ -8,7 +8,6 @@ import {
   CheckCircleIcon,
   ClockIcon,
   SparklesIcon,
-  HeartIcon,
   ImageIcon,
   ChevronLeftIcon,
   ChevronRightIcon,

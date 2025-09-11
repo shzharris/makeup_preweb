@@ -8,12 +8,9 @@ import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { 
   UploadIcon, 
   ArrowRightIcon,
-  SettingsIcon, 
   CheckCircleIcon, 
   ImageIcon,
-  ClockIcon,
   SparklesIcon,
-  HeartIcon,
   StarsIcon,
   EyeIcon
 } from "lucide-react";
@@ -181,7 +178,7 @@ export function ImageProcessor() {
                     <Checkbox 
                       id="public-display"
                       checked={allowPublicDisplay}
-                      onCheckedChange={setAllowPublicDisplay}
+                      onCheckedChange={(checked) => setAllowPublicDisplay(checked === true)}
                       className="border-pink-300 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500"
                     />
                     <label 
