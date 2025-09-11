@@ -69,13 +69,6 @@ export function PriceSelect() {
                     Most Popular
                   </Badge>
                 </div>
-                {plan.limited && (
-                  <div className="absolute -top-8 right-4">
-                    <Badge variant="destructive" className="animate-pulse">
-                      🔥 {plan.limited}
-                    </Badge>
-                  </div>
-                )}
               </>
             )}
 
