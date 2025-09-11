@@ -1,4 +1,5 @@
 import { Button } from "./ui/button";
+import Link from "next/link";
 import { Separator } from "./ui/separator";
 import { Badge } from "./ui/badge";
 import { 
@@ -81,13 +82,13 @@ export function Footer() {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
+                  <Link
                     href={link.href}
                     className="text-muted-foreground hover:text-pink-600 transition-colors text-sm flex items-center gap-2 group"
                   >
                     <div className="w-1 h-1 rounded-full bg-pink-400 group-hover:bg-pink-600 transition-colors" />
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -102,13 +103,13 @@ export function Footer() {
             <ul className="space-y-3">
               {supportLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
+                  <Link
                     href={link.href}
                     className="text-muted-foreground hover:text-pink-600 transition-colors text-sm flex items-center gap-2 group"
                   >
                     <div className="w-1 h-1 rounded-full bg-purple-400 group-hover:bg-purple-600 transition-colors" />
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -139,13 +140,13 @@ export function Footer() {
             <ul className="space-y-3">
               {legalLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
+                  <Link
                     href={link.href}
                     className="text-muted-foreground hover:text-pink-600 transition-colors text-sm flex items-center gap-2 group"
                   >
                     <div className="w-1 h-1 rounded-full bg-rose-400 group-hover:bg-rose-600 transition-colors" />
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

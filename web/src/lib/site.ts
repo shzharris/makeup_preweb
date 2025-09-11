@@ -1,4 +1,4 @@
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com';
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://makeupinsight.us';
 
 export function absoluteUrl(path: string = '/') {
   try {

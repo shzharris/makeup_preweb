@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -12,36 +13,16 @@ export function Navbar() {
       <div className="container-pad h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full" style={{background: 'linear-gradient(135deg, var(--brand-400), var(--brand-600))'}} />
-          <span className="text-base font-semibold tracking-tight">AI Makeup Insight</span>
+          <span className="text-base font-semibold tracking-tight">Makeup Insight AI</span>
         </div>
         <nav className="hidden sm:flex items-center gap-5 text-sm text-gray-600" aria-label="Primary">
-          <a
-            href="/"
-            className="hover:text-pink-500 transition-colors duration-200"
-          >
-            Home
-          </a>
-          <a
-            href="/makeup_analysis"
-            className="hover:text-pink-500 transition-colors duration-200"
-          >
-            Makeup Analysis
-          </a>
-          <a
-            href="/discover_makeup"
-            className="hover:text-pink-500 transition-colors duration-200"
-          >
-            Discover Makeup
-          </a>
-          {/* <a
-            href="/makeup_tips"
-            className="hover:text-pink-500 transition-colors duration-200"
-          >
-            Makeup Tips
-          </a> */}
+          <Link href="/" className="hover:text-pink-500 transition-colors duration-200">Home</Link>
+          <Link href="/makeup_analysis" className="hover:text-pink-500 transition-colors duration-200">Makeup Analysis</Link>
+          <Link href="/discover_makeup" className="hover:text-pink-500 transition-colors duration-200">Discover Makeup</Link>
+          {/* <Link href="/makeup_tips" className="hover:text-pink-500 transition-colors duration-200">Makeup Tips</Link> */}
         </nav>
         <div className="hidden sm:flex items-center gap-3">
-          <a className="btn-primary" href="/login">Sign in</a>
+          <Link className="btn-primary" href="/login">Sign in</Link>
         </div>
         {/* Mobile hamburger icon */}
         <button
@@ -63,12 +44,12 @@ export function Navbar() {
       {open && (
         <div id="mobile-menu" className="sm:hidden border-t border-black/5 bg-white" role="dialog" aria-modal="true">
           <div className="container-pad py-4 flex flex-col gap-4 text-sm">
-            <a href="/" onClick={close} className="hover:text-gray-900">Home</a>
-            <a href="/makeup_analysis" onClick={close} className="hover:text-gray-900">Makeup Analysis</a>
-            <a href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</a>
-            <a href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</a>
+            <Link href="/" onClick={close} className="hover:text-gray-900">Home</Link>
+            <Link href="/makeup_analysis" onClick={close} className="hover:text-gray-900">Makeup Analysis</Link>
+            <Link href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</Link>
+            <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link>
             <div className="pt-2 flex items-center gap-3">
-              <a className="btn-primary" href="/login" onClick={close}>Sign in</a>
+              <Link className="btn-primary" href="/login" onClick={close}>Sign in</Link>
             </div>
           </div>
         </div>
