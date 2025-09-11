@@ -138,9 +138,6 @@ export function PriceSelect() {
           <CheckIcon className="w-4 h-4 text-green-500" />
           <span>24/7 support</span>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Trusted by over 10,000+ users worldwide
-        </p>
       </div>
     </div>
   );
