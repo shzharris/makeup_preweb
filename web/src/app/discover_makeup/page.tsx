@@ -260,7 +260,7 @@ export function BeautyGallery() {
           </h1>
         </div>
         <p className="text-muted-foreground text-lg">
-            Explore our community's amazing looks, all proactively shared by users.
+            Explore our community&apos;s amazing looks, all proactively shared by users.
         </p>
       </div>
 

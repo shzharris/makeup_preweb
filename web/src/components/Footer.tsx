@@ -1,7 +1,6 @@
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
-import { Badge } from "./ui/badge";
 import { 
   SparklesIcon, 
   HeartIcon, 
@@ -12,7 +11,6 @@ import {
   PhoneIcon,
   MapPinIcon,
   ShieldCheckIcon,
-  GiftIcon,
   CrownIcon
 } from "lucide-react";
 

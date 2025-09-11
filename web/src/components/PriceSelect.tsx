@@ -46,7 +46,7 @@ export function PriceSelect() {
       <div className="text-center mb-12">
         <h2 className="text-4xl mb-4">Choose Your Plan</h2>
         <p className="text-muted-foreground text-lg">
-          Select the plan that's right for you. Cancel anytime.
+          Select the plan that&apos;s right for you. Cancel anytime.
         </p>
       </div>
 
