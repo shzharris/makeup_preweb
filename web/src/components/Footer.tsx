@@ -16,19 +16,19 @@ import {
 
 export function Footer() {
   const quickLinks = [
-    { name: "Beauty Tools", href: "#tools" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Beauty Gallery", href: "#gallery" },
-    { name: "Tutorial", href: "#tutorial" }
+    { name: "Home", href: "/" },
+    { name: "Makeup Analysis", href: "/makeup_analysis" },
+    { name: "Discover Makeup", href: "/discover_makeup" },
+    { name: "Price", href: "/?#pricing" }
   ];
 
-  const supportLinks = [
-    { name: "Contact Support", href: "#contact" }
-  ];
+  // const supportLinks = [
+  //   { name: "Contact Support", href: "#contact" }
+  // ];
 
   const legalLinks = [
-    { name: "Privacy Policy", href: "#privacy" },
-    { name: "Terms of Service", href: "#terms" }
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" }
   ];
 
 
@@ -58,7 +58,7 @@ export function Footer() {
             </p>
 
             {/* Social Media */}
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
               <Button size="sm" variant="outline" className="w-10 h-10 p-0 border-pink-300 text-pink-600 hover:bg-pink-50">
                 <InstagramIcon className="w-4 h-4" />
               </Button>
@@ -68,7 +68,7 @@ export function Footer() {
               <Button size="sm" variant="outline" className="w-10 h-10 p-0 border-pink-300 text-pink-600 hover:bg-pink-50">
                 <FacebookIcon className="w-4 h-4" />
               </Button>
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Links */}
@@ -99,34 +99,11 @@ export function Footer() {
               Support
             </h4>
             <ul className="space-y-3">
-              {supportLinks.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-muted-foreground hover:text-pink-600 transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <div className="w-1 h-1 rounded-full bg-purple-400 group-hover:bg-purple-600 transition-colors" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            {/* Contact Info */}
-            <div className="space-y-3 pt-4">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <li  className="flex items-center gap-3 text-sm text-muted-foreground">
                 <MailIcon className="w-4 h-4 text-pink-500" />
-                <span>support@aimakeup.com</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <PhoneIcon className="w-4 h-4 text-pink-500" />
-                <span>400-888-0123</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <MapPinIcon className="w-4 h-4 text-pink-500" />
-                <span>Beijing, China</span>
-              </div>
-            </div>
+                <span>support@makeupinsight.us</span>
+              </li>
+            </ul>
           </div>
 
           {/* Legal */}
@@ -156,14 +133,12 @@ export function Footer() {
 
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>© 2025 AI Makeup Insight</span>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground ">
+            <span>© 2025 Black Flame Digital Service Co., Ltd.</span>
             <div className="w-1 h-1 rounded-full bg-pink-400" />
             <span>All rights reserved</span>
           </div>
-
-        
         </div>
       </div>
 

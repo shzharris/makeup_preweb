@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { 
+  SparklesIcon, 
+  CrownIcon
+} from "lucide-react";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -12,8 +16,17 @@ export function Navbar() {
     <header className="border-b border-black/5 bg-white/80 backdrop-blur sticky top-0 z-40" role="banner">
       <div className="container-pad h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full" style={{background: 'linear-gradient(135deg, var(--brand-400), var(--brand-600))'}} />
-          <span className="text-base font-semibold tracking-tight">Makeup Insight AI</span>
+          <div className="flex items-center gap-3">
+              <div className="relative">
+                <CrownIcon className="w-8 h-8 text-pink-500" />
+                <SparklesIcon className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-pulse" />
+              </div>
+              <div>
+                <h3 className="text-xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                  Makeup Insight AI
+                </h3>
+              </div>
+            </div>
         </div>
         <nav className="hidden sm:flex items-center gap-5 text-sm text-gray-600" aria-label="Primary">
           <Link href="/" className="hover:text-pink-500 transition-colors duration-200">Home</Link>
@@ -47,7 +60,7 @@ export function Navbar() {
             <Link href="/" onClick={close} className="hover:text-gray-900">Home</Link>
             <Link href="/makeup_analysis" onClick={close} className="hover:text-gray-900">Makeup Analysis</Link>
             <Link href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</Link>
-            <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link>
+            {/* <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link> */}
             <div className="pt-2 flex items-center gap-3">
               <Link className="btn-primary" href="/login" onClick={close}>Sign in</Link>
             </div>

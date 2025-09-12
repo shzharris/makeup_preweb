@@ -17,24 +17,24 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AI Makeup Insight | Personalized Makeup Analysis",
-    template: "%s | AI Makeup Insight",
+    default: "Makeup Insight AI | Personalized Makeup Analysis",
+    template: "%s | Makeup Insight AI",
   },
   description: "Upload a selfie to detect makeup issues and get personalized suggestions. Mobile-friendly, privacy-first, and community-powered.",
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   openGraph: {
-    title: "AI Makeup Insight",
+    title: "Makeup Insight AI",
     description: "Personalized AI makeup analysis with mobile-ready uploads and community gallery.",
     url: siteUrl + "/",
-    siteName: "AI Makeup Insight",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "AI Makeup Insight" }],
+    siteName: "Makeup Insight AI",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Makeup Insight AI" }],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Makeup Insight",
+    title: "Makeup Insight AI",
     description: "Personalized AI makeup analysis with mobile-ready uploads and community gallery.",
     images: ["/og.jpg"],
   },
@@ -59,7 +59,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
-              name: 'AI Makeup Insight',
+              name: 'Makeup Insight AI',
               url: siteUrl,
               potentialAction: {
                 '@type': 'SearchAction',

@@ -5,14 +5,14 @@ export const metadata: Metadata = {
   title: "Makeup Tips",
   description: "Practical advice to refine your routine and enhance results.",
   openGraph: {
-    title: "Makeup Tips | AI Makeup Insight",
+    title: "Makeup Tips | Makeup Insight AI",
     description: "Practical advice to refine your routine and enhance results.",
     url: absoluteUrl("/makeup_tips"),
     images: [{ url: "/api/og?title=Makeup%20Tips", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Makeup Tips | AI Makeup Insight",
+    title: "Makeup Tips | Makeup Insight AI",
     description: "Practical advice to refine your routine and enhance results.",
     images: ["/api/og?title=Makeup%20Tips"],
   },

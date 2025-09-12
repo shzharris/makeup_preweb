@@ -322,7 +322,7 @@ export function ImageProcessor() {
               <SparklesIcon className="w-6 h-6 absolute -top-1 -right-1 text-pink-400 animate-pulse" />
             </div>
             <p className="text-lg">No Makeup Insight Result yet</p>
-            <p className="text-sm text-pink-500 mt-2">Upload your first makeup photo to use AI Makeup Insight ✨</p>
+            <p className="text-sm text-pink-500 mt-2">Upload your first makeup photo to use Makeup Insight AI ✨</p>
           </div>
         )}
       </div>

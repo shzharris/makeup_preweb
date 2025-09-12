@@ -42,7 +42,7 @@ export function PriceSelect() {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-16">
+    <div className="w-full max-w-7xl mx-auto px-4 py-16" id="pricing">
       <div className="text-center mb-12">
         <h2 className="text-4xl mb-4">Choose Your Plan</h2>
         <p className="text-muted-foreground text-lg">
