@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { insertUsageLog } from "@/lib/db";
+import type { Session } from "next-auth";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as any).db_user_id) {
+  type SessionUserWithDbId = NonNullable<Session["user"]> & { db_user_id?: string | null };
+  const user = session?.user as SessionUserWithDbId | undefined;
+  const dbUserId = user?.db_user_id ?? null;
+  if (!user || !dbUserId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json().catch(() => ({}));
@@ -15,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
   await insertUsageLog({
-    makeupUserId: (session.user as any).db_user_id as string,
+    makeupUserId: dbUserId,
     action,
     actionDataId,
   });

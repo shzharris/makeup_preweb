@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
@@ -26,13 +26,12 @@ interface ProcessedImage {
 
 export function ImageProcessor() {
   const { status } = useSession();
-  if (status === "unauthenticated") {
-    // Redirect to Google sign-in when not logged in
-    if (typeof window !== "undefined") {
+  useEffect(() => {
+    if (status === "unauthenticated") {
       signIn("google", { callbackUrl: "/makeup_analysis" });
     }
-    return null;
-  }
+  }, [status]);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
