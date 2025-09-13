@@ -33,7 +33,7 @@ export function Features() {
   ];
 
   return (
-    <div className="section-soft section-pad">
+    <div className="section-soft section-pad" id="features">
       <div className="container mx-auto px-4 relative">
         {/* Decorative blobs */}
         <div className="pointer-events-none absolute -z-10 inset-0">
@@ -41,7 +41,7 @@ export function Features() {
           <div className="absolute -bottom-10 right-10 w-64 h-64 rounded-full bg-[--brand-100] blur-3xl opacity-60" />
         </div>
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-10" >
           <h2 className="text-2xl sm:text-3xl font-bold">
             How It Works
           </h2>

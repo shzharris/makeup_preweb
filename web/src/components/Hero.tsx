@@ -15,7 +15,7 @@ export function Hero() {
             </p>
             <div className="mt-8 flex gap-3">
               <Link className="btn-primary" href="/makeup_analysis">Get started</Link>
-              <Link className="btn-ghost" href="#features">Learn more</Link>
+              <Link className="btn-ghost" href="/?#features">Learn more</Link>
             </div>
           </div>
           <div className="rounded-2xl border border-black/5 bg-white/70 p-6 shadow-sm">
