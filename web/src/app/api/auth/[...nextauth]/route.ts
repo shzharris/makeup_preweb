@@ -1,5 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { upsertMakeupUser } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,23 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   // Explicitly set the Google callback path as requested
-  callbacks: {},
+  callbacks: {
+    async signIn({ user, account }) {
+      try {
+        const email = user?.email ?? "";
+        await upsertMakeupUser({
+          loginEmail: email,
+          nickname: user?.name ?? "",
+          avatarUrl: (user as any)?.image ?? "",
+          loginType: account?.provider ?? "google",
+        });
+        return true;
+      } catch (e) {
+        console.error("[NextAuth][signIn][upsertMakeupUser]", e);
+        return false;
+      }
+    },
+  },
   pages: {},
   // Set secret and optionally enable debug via env vars
   secret: process.env.NEXTAUTH_SECRET,

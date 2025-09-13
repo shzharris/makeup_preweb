@@ -24,7 +24,7 @@ export function Navbar() {
               </div>
               <div>
                 <h3 className="text-xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                  Makeup Insight AI
+                  <Link href="/"> Makeup Insight AI </Link>
                 </h3>
               </div>
             </div>

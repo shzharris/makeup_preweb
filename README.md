@@ -65,8 +65,8 @@
 
 create table public.user_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  display_name text,
-  avatar_url text,
+  display_name varchar(100),
+  avatar_url varchar(255),
   created_at timestamptz default now()
 );
 
