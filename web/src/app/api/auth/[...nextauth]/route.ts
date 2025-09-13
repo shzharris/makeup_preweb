@@ -1,6 +1,8 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { upsertMakeupUser, getMakeupUserIdByEmail, insertUsageLog } from "@/lib/db";
+import type { JWT } from "next-auth/jwt";
+import type { Session } from "next-auth";
 
 export const runtime = "nodejs";
 
@@ -32,7 +34,7 @@ export const authOptions: NextAuthOptions = {
         const id = await upsertMakeupUser({
           loginEmail: email,
           nickname: user?.name ?? "",
-          avatarUrl: (user as any)?.image ?? "",
+          avatarUrl: user?.image ?? "",
           loginType: account?.provider ?? "google",
         });
         if (id) {
@@ -53,22 +55,28 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.name = user.name ?? token.name;
         // next-auth uses `picture` in token for image
-        (token as any).picture = (user as any)?.image ?? (token as any).picture;
+        (token as JWT).picture = user?.image ?? (token as JWT).picture;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
+        type ExtendedUser = NonNullable<Session["user"]> & {
+          id?: string | null;
+          db_user_id?: string | null;
+          avatar_url?: string | null;
+        };
+        const su = session.user as ExtendedUser;
         // id from token.sub (provider user id)
-        (session.user as any).id = token.sub;
+        su.id = token.sub ?? null;
         // inject db user id
         const email = session.user.email ?? "";
         const dbId = await getMakeupUserIdByEmail(email);
-        if (dbId) (session.user as any).db_user_id = dbId;
+        if (dbId) su.db_user_id = dbId;
         // nickname from token.name
         session.user.name = (token.name as string | undefined) ?? session.user.name ?? "custom";
         // custom avatar_url field for client usage
-        (session.user as any).avatar_url = (token as any)?.picture ?? "";
+        su.avatar_url = (token as JWT)?.picture ?? "";
       }
       return session;
     },

@@ -141,11 +141,11 @@ export function ImageProcessor() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <h1 className="text-4xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              Makeup Analysis AI
+              Makeup Insight AI
             </h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Let AI analyze your makeup today and get the analysis results in a moment. 
+            Let AI analyze your makeup today and get the insights results in a moment. 
           </p>
         </div>
 
