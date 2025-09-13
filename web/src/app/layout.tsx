@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,11 +70,11 @@ export default function RootLayout({
             }),
           }}
         />
-        <SessionProvider>
+        <Providers>
           <Navbar />
           {children}
           <Footer />
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   );

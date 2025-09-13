@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import { 
   SparklesIcon, 
   CrownIcon
@@ -10,6 +11,13 @@ import {
 
 export function Navbar() {
   const { data: session, status } = useSession();
+  type SessionUser = {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    avatar_url?: string | null;
+  };
+  const su = (session?.user ?? undefined) as SessionUser | undefined;
   const [open, setOpen] = useState(false);
   const toggle = () => setOpen((v) => !v);
   const close = () => setOpen(false);
@@ -39,10 +47,12 @@ export function Navbar() {
         <div className="hidden sm:flex items-center gap-3">
           {status === "authenticated" ? (
             <div className="flex items-center gap-3">
-              <img
-                src={(session.user as any)?.avatar_url || (session.user as any)?.image || "/system/logo.png"}
+              <Image
+                src={su?.avatar_url || su?.image || "/system/logo.png"}
                 alt="avatar"
-                className="w-8 h-8 rounded-full border border-black/10"
+                width={32}
+                height={32}
+                className="rounded-full border border-black/10"
               />
               <span className="text-sm text-gray-700">
                 {(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}
@@ -90,10 +100,12 @@ export function Navbar() {
             <div className="pt-2 flex items-center gap-3">
               {status === "authenticated" ? (
                 <div className="flex items-center gap-3">
-                  <img
-                    src={(session.user as any)?.avatar_url || (session.user as any)?.image || "/system/logo.png"}
+                  <Image
+                    src={su?.avatar_url || su?.image || "/system/logo.png"}
                     alt="avatar"
-                    className="w-8 h-8 rounded-full border border-black/10"
+                    width={32}
+                    height={32}
+                    className="rounded-full border border-black/10"
                   />
                   <span className="text-sm">{(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}</span>
                   <button className="btn-secondary" onClick={() => { close(); signOut({ callbackUrl: "/" }); }}>Logout</button>
