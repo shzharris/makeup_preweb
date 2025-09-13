@@ -4,7 +4,7 @@ export const runtime = 'edge'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const title = searchParams.get('title') || 'AI Makeup Insight'
+  const title = searchParams.get('title') || 'Makeup Insight AI'
 
   return new ImageResponse(
     (

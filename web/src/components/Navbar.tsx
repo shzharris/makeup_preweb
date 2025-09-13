@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { 
   SparklesIcon, 
   CrownIcon
@@ -35,7 +36,12 @@ export function Navbar() {
           {/* <Link href="/makeup_tips" className="hover:text-pink-500 transition-colors duration-200">Makeup Tips</Link> */}
         </nav>
         <div className="hidden sm:flex items-center gap-3">
-          <Link className="btn-primary" href="/login">Sign in</Link>
+          <button
+            className="btn-primary"
+            onClick={() => signIn("google", { callbackUrl: "/makeup_analysis" })}
+          >
+            Sign in
+          </button>
         </div>
         {/* Mobile hamburger icon */}
         <button
@@ -62,7 +68,15 @@ export function Navbar() {
             <Link href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</Link>
             {/* <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link> */}
             <div className="pt-2 flex items-center gap-3">
-              <Link className="btn-primary" href="/login" onClick={close}>Sign in</Link>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  close();
+                  signIn("google", { callbackUrl: "/makeup_analysis" });
+                }}
+              >
+                Sign in
+              </button>
             </div>
           </div>
         </div>
