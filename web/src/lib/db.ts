@@ -4,9 +4,9 @@ import { randomUUID } from "crypto";
 const isProduction = process.env.NODE_ENV === "production";
 
 // Reuse pool across serverless invocations to avoid exhausting connections
-const globalForDb = globalThis as unknown as { pgPool?: any };
+const globalForDb = globalThis as unknown as { pgPool?: Pool };
 
-export const pool =
+export const pool: Pool =
   globalForDb.pgPool ||
   new Pool({
     connectionString: process.env.DATABASE_URL,
