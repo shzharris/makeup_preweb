@@ -4,6 +4,7 @@ import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Checkbox } from "../../components/ui/checkbox";
+import { useSession, signIn } from "next-auth/react";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { 
   UploadIcon, 
@@ -24,6 +25,14 @@ interface ProcessedImage {
 }
 
 export function ImageProcessor() {
+  const { status } = useSession();
+  if (status === "unauthenticated") {
+    // Redirect to Google sign-in when not logged in
+    if (typeof window !== "undefined") {
+      signIn("google", { callbackUrl: "/makeup_analysis" });
+    }
+    return null;
+  }
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -86,6 +95,12 @@ export function ImageProcessor() {
       setPreviewUrl(url);
       setShowResult(false);
       setProcessedResult("");
+      // Log upload intent (use file.name as temp id; real id should be your stored photo id)
+      fetch("/api/usage-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "upload", action_data_id: file.name || "temp" }),
+      }).catch(() => {});
     }
   }, []);
 

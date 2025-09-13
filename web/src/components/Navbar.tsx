@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { 
   SparklesIcon, 
   CrownIcon
 } from "lucide-react";
 
 export function Navbar() {
+  const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
   const toggle = () => setOpen((v) => !v);
   const close = () => setOpen(false);
@@ -36,12 +37,31 @@ export function Navbar() {
           {/* <Link href="/makeup_tips" className="hover:text-pink-500 transition-colors duration-200">Makeup Tips</Link> */}
         </nav>
         <div className="hidden sm:flex items-center gap-3">
-          <button
-            className="btn-primary"
-            onClick={() => signIn("google", { callbackUrl: "/makeup_analysis" })}
-          >
-            Sign in
-          </button>
+          {status === "authenticated" ? (
+            <div className="flex items-center gap-3">
+              <img
+                src={(session.user as any)?.avatar_url || (session.user as any)?.image || "/system/logo.png"}
+                alt="avatar"
+                className="w-8 h-8 rounded-full border border-black/10"
+              />
+              <span className="text-sm text-gray-700">
+                {(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}
+              </span>
+              <button
+                className="btn-secondary"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              className="btn-primary"
+              onClick={() => signIn("google", { callbackUrl: "/makeup_analysis" })}
+            >
+              Sign in
+            </button>
+          )}
         </div>
         {/* Mobile hamburger icon */}
         <button
@@ -68,15 +88,24 @@ export function Navbar() {
             <Link href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</Link>
             {/* <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link> */}
             <div className="pt-2 flex items-center gap-3">
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  close();
-                  signIn("google", { callbackUrl: "/makeup_analysis" });
-                }}
-              >
-                Sign in
-              </button>
+              {status === "authenticated" ? (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={(session.user as any)?.avatar_url || (session.user as any)?.image || "/system/logo.png"}
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full border border-black/10"
+                  />
+                  <span className="text-sm">{(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}</span>
+                  <button className="btn-secondary" onClick={() => { close(); signOut({ callbackUrl: "/" }); }}>Logout</button>
+                </div>
+              ) : (
+                <button
+                  className="btn-primary"
+                  onClick={() => { close(); signIn("google", { callbackUrl: "/makeup_analysis" }); }}
+                >
+                  Sign in
+                </button>
+              )}
             </div>
           </div>
         </div>

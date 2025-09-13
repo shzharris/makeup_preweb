@@ -1,6 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { upsertMakeupUser } from "@/lib/db";
+import { upsertMakeupUser, getMakeupUserIdByEmail, insertUsageLog } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -29,17 +29,48 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       try {
         const email = user?.email ?? "";
-        await upsertMakeupUser({
+        const id = await upsertMakeupUser({
           loginEmail: email,
           nickname: user?.name ?? "",
           avatarUrl: (user as any)?.image ?? "",
           loginType: account?.provider ?? "google",
         });
+        if (id) {
+          await insertUsageLog({ makeupUserId: id, action: "login", actionDataId: id });
+        } else {
+          const existingId = await getMakeupUserIdByEmail(email);
+          if (existingId) {
+            await insertUsageLog({ makeupUserId: existingId, action: "login", actionDataId: existingId });
+          }
+        }
         return true;
       } catch (e) {
         console.error("[NextAuth][signIn][upsertMakeupUser]", e);
         return false;
       }
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.name = user.name ?? token.name;
+        // next-auth uses `picture` in token for image
+        (token as any).picture = (user as any)?.image ?? (token as any).picture;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        // id from token.sub (provider user id)
+        (session.user as any).id = token.sub;
+        // inject db user id
+        const email = session.user.email ?? "";
+        const dbId = await getMakeupUserIdByEmail(email);
+        if (dbId) (session.user as any).db_user_id = dbId;
+        // nickname from token.name
+        session.user.name = (token.name as string | undefined) ?? session.user.name ?? "custom";
+        // custom avatar_url field for client usage
+        (session.user as any).avatar_url = (token as any)?.picture ?? "";
+      }
+      return session;
     },
   },
   pages: {},
