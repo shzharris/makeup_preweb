@@ -109,28 +109,36 @@ export function ImageProcessor() {
     }
   };
 
-  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     setSelectedFile(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setShowResult(false);
     setProcessedResult("");
+  }, []);
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleProcess = async () => {
+    if (!selectedFile) return;
+    setIsProcessing(true);
+    setShowResult(false);
     try {
       // 1) Request a signed upload URL for R2
       const signRes = await fetch("/api/uploads/sign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: file.name, contentType: file.type, is_public: allowPublicDisplay }),
+        body: JSON.stringify({ filename: selectedFile.name, contentType: selectedFile.type, is_public: allowPublicDisplay }),
       });
       if (!signRes.ok) throw new Error("Failed to sign upload");
       const { uploadUrl, headers, publicUrl, is_public } = await signRes.json();
 
       // 2) Upload file to R2 directly
-      const putRes = await fetch(uploadUrl, { method: "PUT", headers, body: file });
+      const putRes = await fetch(uploadUrl, { method: "PUT", headers, body: selectedFile });
       if (!putRes.ok) throw new Error("Failed to upload to R2");
 
       // 3) Insert DB record and get photo id
@@ -149,7 +157,9 @@ export function ImageProcessor() {
         body: JSON.stringify({ action: "upload", action_data_id: photoId }),
       }).catch(() => {});
 
-      // 5) Optimistically add to list
+      // 5) Update UI
+      setProcessedResult(publicUrl);
+      setShowResult(true);
       setProcessedImages(prev => [
         {
           id: photoId,
@@ -162,26 +172,9 @@ export function ImageProcessor() {
       ]);
     } catch (err) {
       console.error("[upload]", err);
-    }
-  }, [allowPublicDisplay, setProcessedImages]);
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleProcess = async () => {
-    if (!selectedFile) return;
-
-    setIsProcessing(true);
-    setShowResult(false);
-
-    // Simulate processing time
-    setTimeout(() => {
-      // Mock processed result - in real app this would come from your API
-      setProcessedResult(previewUrl + "&saturation=2&contrast=1.2");
+    } finally {
       setIsProcessing(false);
-      setShowResult(true);
-    }, 3000);
+    }
   };
 
   const handleReset = () => {
