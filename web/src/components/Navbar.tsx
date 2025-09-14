@@ -60,7 +60,7 @@ export function Navbar() {
                 {(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}
               </span>
               <button
-                className="btn-secondary rounded-full border border-black/20"
+                className="btn-secondary rounded-full border border-black/20 p-5"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
                 Logout
