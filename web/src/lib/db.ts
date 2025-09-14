@@ -15,6 +15,13 @@ export const pool: Pool =
 
 if (!globalForDb.pgPool) globalForDb.pgPool = pool;
 
+// Safe log for debugging: show only host and port if possible
+try {
+  const url = new URL(process.env.DATABASE_URL || "");
+  // eslint-disable-next-line no-console
+  console.log("[DB Init] host:", url.hostname, "port:", url.port || (isProduction ? "5432/6543?" : "5432"));
+} catch {}
+
 export type UpsertMakeupUserParams = {
   loginEmail: string;
   nickname?: string | null;

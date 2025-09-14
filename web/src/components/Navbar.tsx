@@ -53,12 +53,14 @@ export function Navbar() {
                 width={32}
                 height={32}
                 className="rounded-full border border-black/10"
+                unoptimized
+                data-origin-src={su?.avatar_url || su?.image || "/system/logo.png"}
               />
               <span className="text-sm text-gray-700">
                 {(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}
               </span>
               <button
-                className="btn-secondary"
+                className="btn-secondary rounded-full border border-black/20"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
                 Logout
@@ -106,9 +108,11 @@ export function Navbar() {
                     width={32}
                     height={32}
                     className="rounded-full border border-black/10"
+                    unoptimized
+                    data-origin-src={su?.avatar_url || su?.image || "/system/logo.png"}
                   />
                   <span className="text-sm">{(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}</span>
-                  <button className="btn-secondary" onClick={() => { close(); signOut({ callbackUrl: "/" }); }}>Logout</button>
+                  <button className="btn-secondary rounded-full border border-black/20" onClick={() => { close(); signOut({ callbackUrl: "/" }); }}>Logout</button>
                 </div>
               ) : (
                 <button
