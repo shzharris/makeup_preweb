@@ -248,7 +248,7 @@ export function ImageProcessor() {
                     <Button 
                       onClick={handleProcess} 
                       disabled={isProcessing} 
-                      className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+                      className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 accent-white"
                     >
                       {isProcessing ? "✨ Insighting..." : "✨ Start Insight"}
                     </Button>
