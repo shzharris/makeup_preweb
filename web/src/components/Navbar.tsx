@@ -60,7 +60,7 @@ export function Navbar() {
                 {(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}
               </span>
               <button
-                className="btn-secondary rounded-full border border-black/20 p-5"
+                className="btn-secondary rounded-full border border-black/20 p-2"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
                 Logout
@@ -112,7 +112,7 @@ export function Navbar() {
                     data-origin-src={su?.avatar_url || su?.image || "/system/logo.png"}
                   />
                   <span className="text-sm">{(session.user?.name && session.user.name.trim()) ? session.user.name : "custom"}</span>
-                  <button className="btn-secondary rounded-full border border-black/20" onClick={() => { close(); signOut({ callbackUrl: "/" }); }}>Logout</button>
+                  <button className="btn-secondary rounded-full border border-black/20 p-2" onClick={() => { close(); signOut({ callbackUrl: "/" }); }}>Logout</button>
                 </div>
               ) : (
                 <button
