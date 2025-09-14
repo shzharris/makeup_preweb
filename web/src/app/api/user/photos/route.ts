@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import type { Session } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { listMakeupUserPhotos } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const user = session?.user as (typeof session)["user"] & { db_user_id?: string | null } | undefined;
+  const session = (await getServerSession(authOptions)) as Session | null;
+  const user = session?.user as (Session["user"] & { db_user_id?: string | null }) | undefined;
   const dbUserId = user?.db_user_id ?? null;
   if (!dbUserId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
     originalUrl: r.original_url,
     processedUrl: r.processed_url ?? "",
     processedAt: r.created_at,
-    status: (r.status as any) ?? "completed",
+    status: (r.status as "completed" | "processing" | "failed" | null) ?? "completed",
   }));
   return NextResponse.json({ items: data });
 }
