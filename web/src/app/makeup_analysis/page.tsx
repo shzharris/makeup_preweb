@@ -40,51 +40,74 @@ export function ImageProcessor() {
   const [allowPublicDisplay, setAllowPublicDisplay] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mock processed images history
-  const [processedImages] = useState<ProcessedImage[]>([
-    {
-      id: "1",
-      originalUrl: "https://images.unsplash.com/photo-1605474082506-21d31d9d95e8?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1605474082506-21d31d9d95e8?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 14:30",
-      status: 'completed'
-    },
-    {
-      id: "2", 
-      originalUrl: "https://images.unsplash.com/photo-1590393802710-dbf451560939?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1590393802710-dbf451560939?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 13:45",
-      status: 'completed'
-    },
-    {
-      id: "3",
-      originalUrl: "https://images.unsplash.com/photo-1594646996739-9ea802039fe3?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1594646996739-9ea802039fe3?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 12:20",
-      status: 'completed'
-    },
-    {
-      id: "4",
-      originalUrl: "https://images.unsplash.com/photo-1623601903065-0d5b4ae594d4?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1623601903065-0d5b4ae594d4?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 11:15",
-      status: 'completed'
-    },
-    {
-      id: "5",
-      originalUrl: "https://images.unsplash.com/photo-1605813809066-0773a4e7e50e?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1605813809066-0773a4e7e50e?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 16:30",
-      status: 'completed'
-    },
-    {
-      id: "6",
-      originalUrl: "https://images.unsplash.com/photo-1605474082506-21d31d9d95e8?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1605474082506-21d31d9d95e8?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 15:45",
-      status: 'completed'
+  const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
+  const PAGE_SIZE = 12;
+  const [loading, setLoading] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    let aborted = false;
+    const loadInitial = async () => {
+      if (status !== "authenticated") return;
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/user/photos?limit=${PAGE_SIZE}&offset=0`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (aborted) return;
+        const items = (data.items ?? []) as Array<{
+          id: string; originalUrl: string; processedUrl: string; processedAt: string; status: string;
+        }>;
+        const mapped = items.map(i => ({
+          id: i.id,
+          originalUrl: i.originalUrl,
+          processedUrl: i.processedUrl,
+          processedAt: i.processedAt,
+          status: (i.status as 'completed' | 'processing' | 'failed') ?? 'completed',
+        }));
+        setProcessedImages(mapped);
+        setOffset(items.length);
+        setHasMore(items.length === PAGE_SIZE);
+      } catch {}
+      finally {
+        if (!aborted) setLoading(false);
+      }
+    };
+    // reset when auth ready
+    if (status === "authenticated") {
+      setProcessedImages([]);
+      setOffset(0);
+      setHasMore(true);
+      loadInitial();
     }
-  ]);
+    return () => { aborted = true; };
+  }, [status]);
+
+  const loadMore = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/user/photos?limit=${PAGE_SIZE}&offset=${offset}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const items = (data.items ?? []) as Array<{
+        id: string; originalUrl: string; processedUrl: string; processedAt: string; status: string;
+      }>;
+      const mapped = items.map(i => ({
+        id: i.id,
+        originalUrl: i.originalUrl,
+        processedUrl: i.processedUrl,
+        processedAt: i.processedAt,
+        status: (i.status as 'completed' | 'processing' | 'failed') ?? 'completed',
+      }));
+      setProcessedImages(prev => [...prev, ...mapped]);
+      setOffset(prev => prev + items.length);
+      setHasMore(items.length === PAGE_SIZE);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -270,13 +293,13 @@ export function ImageProcessor() {
                 <div className="aspect-square rounded-lg overflow-hidden bg-muted border-2 border-rose-300 relative">
                   <ImageWithFallback
                     src={processedResult}
-                    alt="Enhanced beauty result"
+                    alt="Makeup Insight Result"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-2 right-2">
                     <Badge className="bg-rose-500 text-white">
                       <SparklesIcon className="w-3 h-3 mr-1" />
-                      Enhanced
+                      Makeup Insight
                     </Badge>
                   </div>
                 </div>
@@ -284,7 +307,7 @@ export function ImageProcessor() {
                   variant="outline" 
                   className="w-full border-rose-300 text-rose-700 hover:bg-rose-50 bg-gradient-to-r from-rose-100 to-pink-100"
                 >
-                  💾 Download Your Enhanced Photo
+                  💾 Download Your Makeup Insight Result
                 </Button>
               </div>
             )}
@@ -297,7 +320,7 @@ export function ImageProcessor() {
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <h2 className="text-3xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              My Makeup Gallery
+              My Makeup Record
             </h2>
             <SparklesIcon className="w-6 h-6 text-purple-500" />
           </div>
@@ -327,6 +350,14 @@ export function ImageProcessor() {
               </div>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          {hasMore && (
+            <Button onClick={loadMore} disabled={loading} className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600">
+              {loading ? "Loading..." : "Load More"}
+            </Button>
+          )}
         </div>
 
         {processedImages.length === 0 && (

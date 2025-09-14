@@ -122,4 +122,68 @@ export async function getMakeupUserIdByProviderSub(oauthProvider: string, oauthS
   }
 }
 
+// -----------------------------
+// Makeup User Photo queries
+// -----------------------------
+
+export type MakeupUserPhoto = {
+  id: string;
+  created_at: string;
+  makeup_user_id: string | null;
+  is_public: number | null;
+  original_url: string;
+  processed_url: string | null;
+  status: string | null;
+  failure_reason: string | null;
+  completed_at: string | null;
+};
+
+export async function listMakeupUserPhotos(params: {
+  makeupUserId: string;
+  limit?: number;
+  offset?: number;
+}): Promise<MakeupUserPhoto[]> {
+  const { makeupUserId, limit = 24, offset = 0 } = params;
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `
+      SELECT id, created_at, makeup_user_id, is_public, original_url, processed_url, status, failure_reason, completed_at
+      FROM public.makeup_user_photo
+      WHERE makeup_user_id = $1
+      ORDER BY created_at DESC
+      LIMIT $2 OFFSET $3
+      `,
+      [makeupUserId, limit, offset]
+    );
+    return res.rows as MakeupUserPhoto[];
+  } finally {
+    client.release();
+  }
+}
+
+export async function listPublicMakeupPhotos(params?: {
+  limit?: number;
+  offset?: number;
+}): Promise<MakeupUserPhoto[]> {
+  const limit = params?.limit ?? 24;
+  const offset = params?.offset ?? 0;
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `
+      SELECT id, created_at, makeup_user_id, is_public, original_url, processed_url, status, failure_reason, completed_at
+      FROM public.makeup_user_photo
+      WHERE is_public = 1
+      ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
+      `,
+      [limit, offset]
+    );
+    return res.rows as MakeupUserPhoto[];
+  } finally {
+    client.release();
+  }
+}
+
 
