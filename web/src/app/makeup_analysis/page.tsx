@@ -37,7 +37,7 @@ export function ImageProcessor() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedResult, setProcessedResult] = useState<string>("");
   const [showResult, setShowResult] = useState(false);
-  const [allowPublicDisplay, setAllowPublicDisplay] = useState(false);
+  const [allowPublicDisplay, setAllowPublicDisplay] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [processedImages, setProcessedImages] = useState<ProcessedImage[]>([]);
@@ -109,22 +109,61 @@ export function ImageProcessor() {
     }
   };
 
-  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setShowResult(false);
-      setProcessedResult("");
-      // Log upload intent (use file.name as temp id; real id should be your stored photo id)
+    if (!file) return;
+
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setShowResult(false);
+    setProcessedResult("");
+
+    try {
+      // 1) Request a signed upload URL for R2
+      const signRes = await fetch("/api/uploads/sign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, is_public: allowPublicDisplay }),
+      });
+      if (!signRes.ok) throw new Error("Failed to sign upload");
+      const { uploadUrl, headers, publicUrl, is_public } = await signRes.json();
+
+      // 2) Upload file to R2 directly
+      const putRes = await fetch(uploadUrl, { method: "PUT", headers, body: file });
+      if (!putRes.ok) throw new Error("Failed to upload to R2");
+
+      // 3) Insert DB record and get photo id
+      const dbRes = await fetch("/api/user/photos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ originalUrl: publicUrl, isPublic: !!is_public }),
+      });
+      if (!dbRes.ok) throw new Error("Failed to insert photo record");
+      const { id: photoId } = await dbRes.json();
+
+      // 4) Write usage log with real photo id
       fetch("/api/usage-log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "upload", action_data_id: file.name || "temp" }),
+        body: JSON.stringify({ action: "upload", action_data_id: photoId }),
       }).catch(() => {});
+
+      // 5) Optimistically add to list
+      setProcessedImages(prev => [
+        {
+          id: photoId,
+          originalUrl: publicUrl,
+          processedUrl: "",
+          processedAt: new Date().toISOString(),
+          status: 'completed',
+        },
+        ...prev,
+      ]);
+    } catch (err) {
+      console.error("[upload]", err);
     }
-  }, []);
+  }, [allowPublicDisplay, setProcessedImages]);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();

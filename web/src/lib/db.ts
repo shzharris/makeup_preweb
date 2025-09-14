@@ -186,4 +186,23 @@ export async function listPublicMakeupPhotos(params?: {
   }
 }
 
+export async function insertMakeupUserPhoto(params: {
+  makeupUserId: string;
+  isPublic: boolean;
+  originalUrl: string;
+}): Promise<string> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `INSERT INTO public.makeup_user_photo (makeup_user_id, is_public, original_url, status)
+       VALUES ($1, $2, $3, 'pending')
+       RETURNING id`,
+      [params.makeupUserId, params.isPublic ? 1 : 0, params.originalUrl]
+    );
+    return res.rows[0].id as string;
+  } finally {
+    client.release();
+  }
+}
+
 
