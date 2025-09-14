@@ -1,6 +1,6 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { upsertMakeupUser, getMakeupUserIdByEmail, insertUsageLog } from "@/lib/db";
+import { upsertMakeupUser, getMakeupUserIdByEmail, getMakeupUserIdByProviderSub, insertUsageLog } from "@/lib/db";
 import type { JWT } from "next-auth/jwt";
 import type { Session } from "next-auth";
 
@@ -30,25 +30,29 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       try {
-        const email = user?.email ?? "";
+        const email = user?.email?.trim().toLowerCase() ?? "";
+        const provider = account?.provider ?? "google";
+        const sub = account?.providerAccountId ?? undefined;
+
         const id = await upsertMakeupUser({
           loginEmail: email,
           nickname: user?.name ?? "",
           avatarUrl: user?.image ?? "",
-          loginType: account?.provider ?? "google",
+          loginType: provider,
+          oauthProvider: provider,
+          oauthSub: sub ?? null,
         });
-        if (id) {
-          await insertUsageLog({ makeupUserId: id, action: "login", actionDataId: id });
-        } else {
-          const existingId = await getMakeupUserIdByEmail(email);
-          if (existingId) {
-            await insertUsageLog({ makeupUserId: existingId, action: "login", actionDataId: existingId });
-          }
+
+        const makeupUserId = id || (sub ? await getMakeupUserIdByProviderSub(provider, sub) : (email ? await getMakeupUserIdByEmail(email) : null));
+        if (makeupUserId) {
+          await insertUsageLog({ makeupUserId, action: "login", actionDataId: makeupUserId });
         }
+        // 即便数据库写入失败，也不阻断登录
         return true;
       } catch (e) {
         console.error("[NextAuth][signIn][upsertMakeupUser]", e);
-        return false;
+        // 不阻断登录，避免出现 AccessDenied
+        return true;
       }
     },
     async jwt({ token, user }) {
