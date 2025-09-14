@@ -137,9 +137,23 @@ export function ImageProcessor() {
       if (!signRes.ok) throw new Error("Failed to sign upload");
       const { uploadUrl, headers, publicUrl, is_public } = await signRes.json();
 
-      // 2) Upload file to R2 directly
-      const putRes = await fetch(uploadUrl, { method: "PUT", headers, body: selectedFile });
-      if (!putRes.ok) throw new Error("Failed to upload to R2");
+      // 2) Try direct upload to R2
+      let uploaded = false;
+      try {
+        const putRes = await fetch(uploadUrl, { method: "PUT", headers, body: selectedFile });
+        uploaded = putRes.ok;
+      } catch {
+        uploaded = false;
+      }
+
+      // 2b) Fallback to proxy when direct upload fails (CORS or other)
+      if (!uploaded) {
+        const fd = new FormData();
+        fd.append("uploadUrl", uploadUrl);
+        fd.append("file", selectedFile);
+        const proxyRes = await fetch("/api/uploads/proxy", { method: "POST", body: fd });
+        if (!proxyRes.ok) throw new Error("Proxy upload failed");
+      }
 
       // 3) Insert DB record and get photo id
       const dbRes = await fetch("/api/user/photos", {
