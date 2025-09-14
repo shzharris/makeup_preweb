@@ -55,11 +55,14 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.name = user.name ?? token.name;
         // next-auth uses `picture` in token for image
         (token as JWT).picture = user?.image ?? (token as JWT).picture;
+      }
+      if (account?.provider) {
+        (token as JWT & { provider?: string }).provider = account.provider;
       }
       return token;
     },
@@ -73,10 +76,21 @@ export const authOptions: NextAuthOptions = {
         const su = session.user as ExtendedUser;
         // id from token.sub (provider user id)
         su.id = token.sub ?? null;
-        // inject db user id
-        const email = session.user.email ?? "";
-        const dbId = await getMakeupUserIdByEmail(email);
-        if (dbId) su.db_user_id = dbId;
+        // inject db user id (prefer provider+sub, fallback to email)
+        try {
+          const provider = (token as JWT & { provider?: string }).provider;
+          let dbId: string | null = null;
+          if (provider && token.sub) {
+            dbId = await getMakeupUserIdByProviderSub(provider, token.sub);
+          }
+          if (!dbId) {
+            const email = session.user.email ?? "";
+            if (email) dbId = await getMakeupUserIdByEmail(email);
+          }
+          if (dbId) su.db_user_id = dbId;
+        } catch (err) {
+          console.error("[NextAuth][session][db lookup]", err);
+        }
         // nickname from token.name
         session.user.name = (token.name as string | undefined) ?? session.user.name ?? "custom";
         // custom avatar_url field for client usage
