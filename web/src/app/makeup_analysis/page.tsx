@@ -6,6 +6,8 @@ import { Badge } from "../../components/ui/badge";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useSession, signIn } from "next-auth/react";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
+import { SimpleImagePlaceholder } from '../../components/figma/imagePlaceholder'
+
 import { 
   UploadIcon, 
   ArrowRightIcon,
@@ -382,9 +384,22 @@ export function ImageProcessor() {
               className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-sm border-pink-200 hover:border-pink-300"
             >
               <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3 border-2 border-pink-100 relative">
+              {image.processedUrl ? (
+      <ImageWithFallback
+      src={image.processedUrl}
+      alt="makeup insight result"
+      className="w-full h-full object-cover"
+    />
+    ) : (
+
+      <SimpleImagePlaceholder className="w-full h-full" />
+    )}
+
+
+
                 <ImageWithFallback
                   src={image.processedUrl}
-                  alt="Enhanced beauty photo"
+                  alt="makeup insight result"
                   className="w-full h-full object-cover"
                 />
               </div>
