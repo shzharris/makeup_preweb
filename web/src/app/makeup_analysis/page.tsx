@@ -385,23 +385,14 @@ export function ImageProcessor() {
             >
               <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3 border-2 border-pink-100 relative">
               {image.processedUrl ? (
-      <ImageWithFallback
-      src={image.processedUrl}
-      alt="makeup insight result"
-      className="w-full h-full object-cover"
-    />
-    ) : (
-
-      <SimpleImagePlaceholder className="w-full h-full" />
-    )}
-
-
-
                 <ImageWithFallback
-                  src={image.processedUrl}
-                  alt="makeup insight result"
-                  className="w-full h-full object-cover"
-                />
+                src={image.processedUrl}
+                alt="makeup insight result"
+                className="w-full h-full object-cover"
+              />
+              ) : (
+                <SimpleImagePlaceholder className="w-full h-full" />
+              )}
               </div>
               
               <div className="space-y-2">
