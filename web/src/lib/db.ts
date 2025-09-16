@@ -205,4 +205,60 @@ export async function insertMakeupUserPhoto(params: {
   }
 }
 
+export async function getPhotoById(photoId: string): Promise<MakeupUserPhoto | null> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `SELECT id, created_at, makeup_user_id, is_public, original_url, processed_url, status, failure_reason, completed_at
+       FROM public.makeup_user_photo
+       WHERE id = $1
+       LIMIT 1`,
+      [photoId]
+    );
+    return (res.rows[0] as MakeupUserPhoto) ?? null;
+  } finally {
+    client.release();
+  }
+}
+
+export async function updatePhotoProcessing(photoId: string): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query(
+      `UPDATE public.makeup_user_photo SET status = 'processing' WHERE id = $1`,
+      [photoId]
+    );
+  } finally {
+    client.release();
+  }
+}
+
+export async function updatePhotoProcessed(photoId: string, processedUrl: string): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query(
+      `UPDATE public.makeup_user_photo
+       SET processed_url = $2, status = 'completed', completed_at = NOW()
+       WHERE id = $1`,
+      [photoId, processedUrl]
+    );
+  } finally {
+    client.release();
+  }
+}
+
+export async function updatePhotoFailed(photoId: string, reason: string): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query(
+      `UPDATE public.makeup_user_photo
+       SET status = 'failed', failure_reason = $2
+       WHERE id = $1`,
+      [photoId, reason.slice(0, 500)]
+    );
+  } finally {
+    client.release();
+  }
+}
+
 

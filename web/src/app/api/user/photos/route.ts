@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { listMakeupUserPhotos, insertMakeupUserPhoto } from "@/lib/db";
+import { listMakeupUserPhotos, insertMakeupUserPhoto, updatePhotoProcessing, updatePhotoProcessed, updatePhotoFailed } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as Session | null;

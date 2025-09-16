@@ -7,8 +7,8 @@ interface ImagePlaceholderProps {
 }
 
 export function ImagePlaceholder({ 
-  width = 300, 
-  height = 300, 
+  width = 244, 
+  height = 244, 
   className = "" 
 }: ImagePlaceholderProps) {
   return (
@@ -42,8 +42,8 @@ export function ImagePlaceholder({
 
 // Alternative version with just gray background (no image)
 export function SimpleImagePlaceholder({ 
-  width = 300, 
-  height = 300, 
+  width = 244, 
+  height = 244, 
   className = "" 
 }: ImagePlaceholderProps) {
   return (
