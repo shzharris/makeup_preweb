@@ -261,4 +261,60 @@ export async function updatePhotoFailed(photoId: string, reason: string): Promis
   }
 }
 
+// -----------------------------
+// Subscriptions
+// -----------------------------
+
+export type MakeupUserSubscription = {
+  id: string;
+  created_at: string;
+  makeup_user_id: string | null;
+  subscriptions_type: string | null; // '1' | '2' | '3'
+  price: number | null;
+  start_time: string | null; // stored as time without time zone
+  end_time: string | null;   // stored as time without time zone
+  is_cacelled: number | null; // 0/1
+  is_settlement: number | null; // 0/1
+};
+
+export async function getLatestSubscriptionByUserId(makeupUserId: string): Promise<MakeupUserSubscription | null> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `SELECT id, created_at, makeup_user_id, subscriptions_type, price, start_time, end_time, is_cacelled, is_settlement
+       FROM public.makeup_user_subscriptions
+       WHERE makeup_user_id = $1 and is_cacelled = 0
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [makeupUserId]
+    );
+    return (res.rows[0] as MakeupUserSubscription) ?? null;
+  } finally {
+    client.release();
+  }
+}
+
+export async function settleOneTimeSubscription(makeupUserId: string): Promise<string | null> {
+  const client = await pool.connect();
+  try {
+    // 找到用户最近的一次性订阅（未结算、未取消）
+    const sel = await client.query(
+      `SELECT id FROM public.makeup_user_subscriptions
+       WHERE makeup_user_id = $1 AND subscriptions_type = '1' AND COALESCE(is_settlement,0) = 0 AND COALESCE(is_cacelled,0) = 0
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [makeupUserId]
+    );
+    const id = sel.rows[0]?.id as string | undefined;
+    if (!id) return null;
+    await client.query(
+      `UPDATE public.makeup_user_subscriptions SET is_settlement = 1 WHERE id = $1`,
+      [id]
+    );
+    return id;
+  } finally {
+    client.release();
+  }
+}
+
 

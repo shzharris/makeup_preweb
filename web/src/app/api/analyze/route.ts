@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { updatePhotoProcessing, updatePhotoProcessed, updatePhotoFailed, getPhotoById, insertUsageLog } from "@/lib/db";
+import { updatePhotoProcessing, updatePhotoProcessed, updatePhotoFailed, getPhotoById, insertUsageLog, getLatestSubscriptionByUserId, settleOneTimeSubscription } from "@/lib/db";
 import { GoogleGenAI } from "@google/genai";
 import crypto from "crypto";
 
@@ -144,6 +144,16 @@ export async function POST(req: NextRequest) {
     const processedUrl = publicBase ? `${publicBase}/${key}` : `${endpoint}/${bucket}/${key}`;
 
     await updatePhotoProcessed(photoId, processedUrl);
+    // 若一次性订阅（type=1）且未结算，则结算
+    if (makeupUserId) {
+      const sub = await getLatestSubscriptionByUserId(makeupUserId);
+      if (sub && String(sub.subscriptions_type || '') === '1' && (sub.is_settlement ?? 0) === 0 && (sub.is_cacelled ?? 0) === 0) {
+        const settledId = await settleOneTimeSubscription(makeupUserId);
+        if (settledId) {
+          await insertUsageLog({ makeupUserId, action: 'subscription_settled', actionDataId: settledId });
+        }
+      }
+    }
     if (makeupUserId) {
       if (textOut) {
         await insertUsageLog({ makeupUserId, action: "model_text", actionDataId: textOut.slice(0, 1000) });

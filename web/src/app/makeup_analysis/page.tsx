@@ -47,6 +47,27 @@ export function ImageProcessor() {
   const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [subModalOpen, setSubModalOpen] = useState(false);
+  const [subModalMsg, setSubModalMsg] = useState<string>("");
+
+  const mapReasonToMessage = (reason?: string) => {
+    switch (reason) {
+      case 'no_subscription':
+        return "You don't have an active plan yet. AI processing incurs costs. Please subscribe first. Thank you!";
+      case 'cancelled':
+        return 'Your subscription has been canceled. Please subscribe again to continue.';
+      case 'settled':
+        return 'Your pay-per-use quota is used up. Please renew or switch to another plan.';
+      case 'out_of_window':
+        return "Your plan isn't active right now. Please try during the valid time window or adjust your plan.";
+      case 'unknown_type':
+        return 'Unrecognized subscription type. Please check your plan or contact support.';
+      case 'unauthorized':
+        return 'You are not signed in or your session expired. Please sign in again.';
+      default:
+        return 'Subscription check failed. Please subscribe before using AI processing.';
+    }
+  };
 
   useEffect(() => {
     let aborted = false;
@@ -130,6 +151,16 @@ export function ImageProcessor() {
     setIsProcessing(true);
     setShowResult(false);
     try {
+      // 0) Check subscription status
+      const subRes = await fetch('/api/subscription/status');
+      if (!subRes.ok) throw new Error('Unauthorized or subscription check failed');
+      const subJson = await subRes.json();
+      if (!subJson.ok) {
+        setSubModalMsg(mapReasonToMessage(subJson.reason));
+        setSubModalOpen(true);
+        return;
+      }
+
       // 1) Request a signed upload URL for R2
       const signRes = await fetch("/api/uploads/sign", {
         method: "POST",
@@ -457,6 +488,24 @@ export function ImageProcessor() {
           </div>
         )}
       </div>
+
+      {/* Subscription Modal */}
+      {subModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSubModalOpen(false)} />
+          <div className="relative w-full max-w-md mx-auto rounded-2xl p-6 shadow-xl bg-white border border-pink-200">
+            <div className="flex items-center gap-2 mb-3">
+              <SparklesIcon className="w-5 h-5 text-pink-500" />
+              <h4 className="text-lg font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Subscription Tip</h4>
+            </div>
+            <p className="text-sm text-pink-800 mb-4">{subModalMsg}</p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-50" onClick={() => setSubModalOpen(false)}>Later</Button>
+              <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white" onClick={() => { setSubModalOpen(false); window.location.href = '/?#pricing'; }}>Go to Subscription</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
