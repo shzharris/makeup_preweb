@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { updatePhotoProcessing, updatePhotoProcessed, updatePhotoFailed, getPhotoById, insertUsageLog } from "@/lib/db";
 import { GoogleGenAI } from "@google/genai";
-import mime from "mime";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -86,7 +85,7 @@ export async function POST(req: NextRequest) {
     const datestamp2 = amzDate2.slice(0, 8);
     const region = "auto";
     const service = "s3";
-    const ext = (mime as any).getExtension ? (mime as any).getExtension(outMime || "") || "png" : "png";
+    const ext = (outMime && outMime.includes("/")) ? (outMime.split("/")[1] || "png") : "png";
     const key = `processed/${photoId}.${ext}`;
     const canonicalUri2 = `/${bucket}/${encodeURIComponent(key).replace(/%2F/g, "/")}`;
     const signedHeaders2 = "host";
