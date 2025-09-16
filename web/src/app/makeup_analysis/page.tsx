@@ -218,6 +218,24 @@ export function ImageProcessor() {
     }
   };
 
+  const handleDownload = async () => {
+    if (!processedResult) return;
+    try {
+      const res = await fetch(processedResult);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const name = (processedResult.split('/').pop() || 'makeup-insight.png').split('?')[0];
+      a.href = url;
+      a.download = name || 'makeup-insight.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {}
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8">
       {/* Main Processing Section */}
@@ -264,7 +282,7 @@ export function ImageProcessor() {
                     <Button 
                       onClick={handleProcess} 
                       disabled={isProcessing} 
-                      className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 accent-white"
+                      className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white"
                     >
                       {isProcessing ? "✨ Insighting..." : "✨ Start Insight"}
                     </Button>
@@ -356,7 +374,7 @@ export function ImageProcessor() {
                   <ImageWithFallback
                     src={processedResult}
                     alt="Makeup Insight Result"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                   <div className="absolute top-2 right-2">
                     <Badge className="bg-rose-500 text-white">
@@ -368,6 +386,8 @@ export function ImageProcessor() {
                 <Button 
                   variant="outline" 
                   className="w-full border-rose-300 text-rose-700 hover:bg-rose-50 bg-gradient-to-r from-rose-100 to-pink-100"
+                  onClick={handleDownload}
+                  disabled={!processedResult}
                 >
                   💾 Download Your Makeup Insight Result
                 </Button>
@@ -402,7 +422,7 @@ export function ImageProcessor() {
                 <ImageWithFallback
                 src={image.processedUrl}
                 alt="makeup insight result"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               ) : (
                 <SimpleImagePlaceholder className="w-full h-full" />

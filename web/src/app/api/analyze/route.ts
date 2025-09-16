@@ -65,18 +65,18 @@ export async function POST(req: NextRequest) {
       }
     } catch (e) {
       // fallback to non-streaming API
+      type GenPart = { inlineData?: { data?: string; mimeType?: string }; text?: string };
       const resp = (await ai.models.generateContent({ model, config, contents })) as unknown as {
-        candidates?: Array<{ content?: { parts?: Array<{ inlineData?: { data?: string; mimeType?: string }; text?: string }> } }>;
+        candidates?: Array<{ content?: { parts?: GenPart[] } }>;
       };
-      const parts = resp?.candidates?.[0]?.content?.parts ?? [];
+      const parts: GenPart[] = resp?.candidates?.[0]?.content?.parts ?? [];
       for (const p of parts) {
-        if ((p as any).inlineData?.data && !outImageB64) {
-          const idata = (p as { inlineData: { data?: string; mimeType?: string } }).inlineData;
-          outImageB64 = idata.data || null;
-          if (idata.mimeType) outMime = idata.mimeType;
+        if (p.inlineData?.data && !outImageB64) {
+          outImageB64 = p.inlineData.data || null;
+          if (p.inlineData.mimeType) outMime = p.inlineData.mimeType;
         }
-        if ((p as any).text) {
-          textOut += (p as { text: string }).text;
+        if (p.text) {
+          textOut += p.text;
         }
       }
     }
