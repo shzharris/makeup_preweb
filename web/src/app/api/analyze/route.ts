@@ -43,24 +43,41 @@ export async function POST(req: NextRequest) {
       { role: "user", parts: [{ text: ENHANCE_PROMPT }, { inlineData: { data: base64, mimeType: mime } }] },
     ];
 
-    const stream = (await ai.models.generateContentStream({ model, config, contents })) as unknown as AsyncIterable<{
-      candidates?: Array<{ content?: { parts?: Array<{ inlineData?: { data?: string; mimeType?: string } }> } }>;
-      text?: string;
-    }>;
-
     let outImageB64: string | null = null;
     let outMime: string = "image/png";
     let textOut = "";
-    for await (const chunk of stream) {
-      const parts = chunk?.candidates?.[0]?.content?.parts ?? [];
-      const first = parts[0];
-      if (first?.inlineData?.data) {
-        outImageB64 = first.inlineData.data;
-        if (first.inlineData.mimeType) outMime = first.inlineData.mimeType;
-        break;
+    try {
+      const stream = (await ai.models.generateContentStream({ model, config, contents })) as unknown as AsyncIterable<{
+        candidates?: Array<{ content?: { parts?: Array<{ inlineData?: { data?: string; mimeType?: string } }> } }>;
+        text?: string;
+      }>;
+      for await (const chunk of stream) {
+        const parts = chunk?.candidates?.[0]?.content?.parts ?? [];
+        const first = parts[0];
+        if (first?.inlineData?.data) {
+          outImageB64 = first.inlineData.data;
+          if (first.inlineData.mimeType) outMime = first.inlineData.mimeType;
+          break;
+        }
+        if (chunk?.text) {
+          textOut += chunk.text;
+        }
       }
-      if (chunk?.text) {
-        textOut += chunk.text;
+    } catch (e) {
+      // fallback to non-streaming API
+      const resp = (await ai.models.generateContent({ model, config, contents })) as unknown as {
+        candidates?: Array<{ content?: { parts?: Array<{ inlineData?: { data?: string; mimeType?: string }; text?: string }> } }>;
+      };
+      const parts = resp?.candidates?.[0]?.content?.parts ?? [];
+      for (const p of parts) {
+        if ((p as any).inlineData?.data && !outImageB64) {
+          const idata = (p as { inlineData: { data?: string; mimeType?: string } }).inlineData;
+          outImageB64 = idata.data || null;
+          if (idata.mimeType) outMime = idata.mimeType;
+        }
+        if ((p as any).text) {
+          textOut += (p as { text: string }).text;
+        }
       }
     }
 
