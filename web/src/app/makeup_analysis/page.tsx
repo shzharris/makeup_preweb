@@ -166,6 +166,16 @@ export function ImageProcessor() {
       if (!dbRes.ok) throw new Error("Failed to insert photo record");
       const { id: photoId } = await dbRes.json();
 
+      // 3b) Trigger server-side AI processing (Gemini) synchronously and wait for result
+      const analyzeRes = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoId, originalUrl: publicUrl, contentType: selectedFile.type }),
+      });
+      if (!analyzeRes.ok) throw new Error("AI analyze failed");
+      const analyzeJson = await analyzeRes.json();
+      const processedUrlFromAI: string = analyzeJson.processedUrl || "";
+
       // 4) Write usage log with real photo id
       fetch("/api/usage-log", {
         method: "POST",
@@ -173,19 +183,23 @@ export function ImageProcessor() {
         body: JSON.stringify({ action: "upload", action_data_id: photoId }),
       }).catch(() => {});
 
-      // 5) Update UI
-      setProcessedResult(publicUrl);
+      // 5) Update UI with processed result
+      setProcessedResult(processedUrlFromAI || publicUrl);
       setShowResult(true);
-      setProcessedImages(prev => [
-        {
+      setProcessedImages(prev => {
+        const exists = prev.find(p => p.id === photoId);
+        const item = {
           id: photoId,
           originalUrl: publicUrl,
-          processedUrl: "",
+          processedUrl: processedUrlFromAI || "",
           processedAt: new Date().toISOString(),
-          status: 'completed',
-        },
-        ...prev,
-      ]);
+          status: 'completed' as const,
+        };
+        if (exists) {
+          return prev.map(p => p.id === photoId ? item : p);
+        }
+        return [item, ...prev];
+      });
     } catch (err) {
       console.error("[upload]", err);
     } finally {
