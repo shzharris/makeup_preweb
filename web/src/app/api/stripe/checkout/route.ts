@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (!baseUrl) {
     return NextResponse.json({ error: "Missing NEXTAUTH_URL for redirect URLs" }, { status: 500 });
   }
-  const success = successUrl || `${baseUrl}/?checkout=success`;
+  const success = successUrl || `${baseUrl}/makeup_analysis?checkout=success`;
   const cancel = cancelUrl || `${baseUrl}/?checkout=cancel`;
 
   const dbUserId = (session.user as unknown as { db_user_id?: string | null })?.db_user_id || "";
