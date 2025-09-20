@@ -273,15 +273,18 @@ export type MakeupUserSubscription = {
   price: number | null;
   start_time: string | null; // stored as time without time zone
   end_time: string | null;   // stored as time without time zone
+  start_at?: string | null; // timestamptz
+  end_at?: string | null;   // timestamptz
   is_cacelled: number | null; // 0/1
   is_settlement: number | null; // 0/1
+  pay_result?: string | null;
 };
 
 export async function getLatestSubscriptionByUserId(makeupUserId: string): Promise<MakeupUserSubscription | null> {
   const client = await pool.connect();
   try {
     const res = await client.query(
-      `SELECT id, created_at, makeup_user_id, subscriptions_type, price, start_time, end_time, is_cacelled, is_settlement
+      `SELECT id, created_at, makeup_user_id, subscriptions_type, price, start_time, end_time, is_cacelled, is_settlement, pay_result, start_at, end_at
        FROM public.makeup_user_subscriptions
        WHERE makeup_user_id = $1 and is_cacelled = 0 and pay_result = 'paid'
        ORDER BY created_at DESC
@@ -324,16 +327,18 @@ export async function insertSubscriptionRecord(params: {
   payResult: 'unpaid' | 'paid' | 'faild';
   startTime?: string | null; // 'HH:MM:SS'
   endTime?: string | null;   // 'HH:MM:SS'
+  startAt?: string | null;   // timestamptz ISO
+  endAt?: string | null;     // timestamptz ISO
 }): Promise<string> {
-  const { makeupUserId, subscriptionsType, price, payResult, startTime, endTime } = params;
+  const { makeupUserId, subscriptionsType, price, payResult, startTime, endTime, startAt, endAt } = params;
   const client = await pool.connect();
   try {
     const res = await client.query(
       `INSERT INTO public.makeup_user_subscriptions
-         (makeup_user_id, subscriptions_type, price, start_time, end_time, is_cacelled, is_settlement, pay_result)
-       VALUES ($1, $2, $3, $4, $5, 0, 0, $6)
+         (makeup_user_id, subscriptions_type, price, start_time, end_time, start_at, end_at, is_cacelled, is_settlement, pay_result)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 0, 0, $8)
        RETURNING id`,
-      [makeupUserId, subscriptionsType, price, startTime ?? null, endTime ?? null, payResult]
+      [makeupUserId, subscriptionsType, price, startTime ?? null, endTime ?? null, startAt ?? null, endAt ?? null, payResult]
     );
     return res.rows[0].id as string;
   } finally {

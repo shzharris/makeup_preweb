@@ -149,7 +149,7 @@ export function PriceSelect() {
                 const r = await fetch('/api/stripe/checkout', {
                   method: 'POST',
                   headers: { 'Content-Type':'application/json' },
-                  body: JSON.stringify({ mode, priceId, subscriptionsType, successUrl: `${location.origin}/?checkout=success`, cancelUrl: `${location.origin}/?checkout=cancel` })
+                  body: JSON.stringify({ mode, priceId, subscriptionsType, successUrl: `${location.origin}/makeup_analysis?checkout=success`, cancelUrl: `${location.origin}/?checkout=cancel` })
                 });
                 const data = await r.json();
                 if (data?.url) window.location.href = data.url;

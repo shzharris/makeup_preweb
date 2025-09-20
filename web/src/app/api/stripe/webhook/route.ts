@@ -36,7 +36,8 @@ export async function POST(req: NextRequest) {
       const makeupUserId = (session.metadata?.makeup_user_id as string | undefined) || "";
       if (makeupUserId) {
         const now = new Date();
-        const fmt = (d: Date) => `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+        const fmtTime = (d: Date) => `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+        const toIso = (d: Date) => d.toISOString();
         const typeMeta = (session.metadata?.subscriptions_type as '1'|'2'|'3'|undefined);
         if (mode === "payment") {
           // 一次性
@@ -45,9 +46,12 @@ export async function POST(req: NextRequest) {
             subscriptionsType: '1',
             price,
             payResult: 'paid',
-            startTime: fmt(now),
+            startTime: fmtTime(now),
+            startAt: now.toISOString(),
             endTime: null,
+            endAt: null,
           });
+          // 同步写入新字段（若已加 start_at/end_at 列，建议用单独 UPDATE 语句；这里保持 insert 方法兼容旧结构）
         } else if (mode === "subscription") {
           const type = typeMeta || '2';
           if (type !== '2' && type !== '3') throw new Error('Invalid subscriptions_type');
@@ -58,8 +62,10 @@ export async function POST(req: NextRequest) {
             subscriptionsType: type,
             price,
             payResult: 'paid',
-            startTime: fmt(now),
-            endTime: fmt(end),
+            startTime: fmtTime(now),
+            endTime: fmtTime(end),
+            startAt: now.toISOString(),
+            endAt: end.toISOString(),
           });
         } else {
           throw new Error('Invalid checkout mode');

@@ -15,23 +15,32 @@ export async function GET(_req: NextRequest) {
   if (sub.is_cacelled === 1) return NextResponse.json({ ok: false, reason: "cancelled" });
 
   const type = String(sub.subscriptions_type || "");
+  // 优先使用 start_at/end_at 判断
+  if (sub.start_at) {
+    const now = Date.now();
+    const startAt = Date.parse(sub.start_at);
+    const endAt = sub.end_at ? Date.parse(sub.end_at) : undefined;
+    const active = now >= startAt && (endAt ? now <= endAt : true);
+    if (!active) return NextResponse.json({ ok: false, reason: "out_of_window" });
+  } else {
+    // 旧字段回退
+    if (type === "2" || type === "3") {
+      const toMinutes = (t: string) => { const [h,m] = t.split(":"); return parseInt(h||"0")*60 + parseInt(m||"0"); };
+      const now = new Date();
+      const start = sub.start_time ? toMinutes(sub.start_time) : 0;
+      const end = sub.end_time ? toMinutes(sub.end_time) : 24*60;
+      const cur = now.getHours()*60 + now.getMinutes();
+      const active = cur >= start && cur <= end;
+      if (!active) return NextResponse.json({ ok: false, reason: "out_of_window" });
+    }
+  }
+
   if (type === "1") {
     // 按次：需要检查是否已结算（用完）
     if (sub.is_settlement === 1) return NextResponse.json({ ok: false, reason: "settled" });
     return NextResponse.json({ ok: true, type: 1 });
   }
   if (type === "2" || type === "3") {
-    // 时间窗：对比 start_time/end_time（时间字段，没有日期；假设以当天为基准时段）
-    const now = new Date();
-    const toMinutes = (t: string) => {
-      const [h, m, s] = t.split(":");
-      return parseInt(h || "0") * 60 + parseInt(m || "0");
-    };
-    const start = sub.start_time ? toMinutes(sub.start_time) : 0;
-    const end = sub.end_time ? toMinutes(sub.end_time) : 24 * 60;
-    const cur = now.getHours() * 60 + now.getMinutes();
-    const active = cur >= start && cur <= end;
-    if (!active) return NextResponse.json({ ok: false, reason: "out_of_window" });
     return NextResponse.json({ ok: true, type: Number(type) });
   }
   return NextResponse.json({ ok: false, reason: "unknown_type" });
