@@ -34,7 +34,7 @@ export function PriceSelect() {
       description: "Best value for half-year access.",
       price: "$39.99",
       period: "6 months",
-      originalPrice: "$59.99",
+      originalPrice: "$119.99",
       savePercent: "33%",
       features: ["6 months unlimited access", "All premium features", "Dedicated support", "Free upgrades"],
       buttonText: "Subscribe",
