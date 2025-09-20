@@ -113,7 +113,7 @@ export function BeautyGallery() {
       <div className="mb-12 text-center">
         <div className="flex items-center justify-center gap-3 mb-4">
           <h1 className="text-4xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-            Discover User's Makeup
+            Discover User&apos;s Makeup
           </h1>
         </div>
         <p className="text-muted-foreground text-lg">
