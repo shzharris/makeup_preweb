@@ -118,6 +118,40 @@ export function PriceSelect() {
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5' 
                   : 'hover:shadow-md'
               }`}
+              onClick={async () => {
+                // 这里替换为你在 Stripe 中创建的价格 ID
+                const PRICE_ONE_TIME = process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_TIME || '';
+                const PRICE_MONTH = process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTH || '';
+                const PRICE_6MONTH = process.env.NEXT_PUBLIC_STRIPE_PRICE_6MONTH || '';
+
+                let mode: 'payment' | 'subscription' = 'payment';
+                let priceId = '';
+                let subscriptionsType: '1' | '2' | '3' = '1';
+                if (plan.name === 'One-time') {
+                  mode = 'payment';
+                  priceId = PRICE_ONE_TIME;
+                  subscriptionsType = '1';
+                } else if (plan.name === 'Monthly') {
+                  mode = 'subscription';
+                  priceId = PRICE_MONTH;
+                  subscriptionsType = '2';
+                } else {
+                  mode = 'subscription';
+                  priceId = PRICE_6MONTH;
+                  subscriptionsType = '3';
+                }
+                if (!priceId) {
+                  alert('PriceId not configured');
+                  return;
+                }
+                const r = await fetch('/api/stripe/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type':'application/json' },
+                  body: JSON.stringify({ mode, priceId, subscriptionsType, successUrl: `${location.origin}/?checkout=success`, cancelUrl: `${location.origin}/?checkout=cancel` })
+                });
+                const data = await r.json();
+                if (data?.url) window.location.href = data.url;
+              }}
             >
               {plan.popular && <StarIcon className="w-4 h-4 mr-2" />}
               {plan.buttonText}

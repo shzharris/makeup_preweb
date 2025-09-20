@@ -27,7 +27,7 @@ export default function PrivacyPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-pink-600 to-rose-500 bg-clip-text text-transparent">
             Privacy Policy
           </h1>
-          <p className="text-muted-foreground mt-2">Updated: September 12, 2025</p>
+          <p className="text-muted-foreground mt-2">black flame DIGITAL Service Company Ltd. Updated: September 12, 2025</p>
         </div>
 
         {/* Content Card */}

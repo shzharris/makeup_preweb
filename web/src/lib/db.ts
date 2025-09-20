@@ -283,7 +283,7 @@ export async function getLatestSubscriptionByUserId(makeupUserId: string): Promi
     const res = await client.query(
       `SELECT id, created_at, makeup_user_id, subscriptions_type, price, start_time, end_time, is_cacelled, is_settlement
        FROM public.makeup_user_subscriptions
-       WHERE makeup_user_id = $1 and is_cacelled = 0
+       WHERE makeup_user_id = $1 and is_cacelled = 0 and pay_result = 'paid'
        ORDER BY created_at DESC
        LIMIT 1`,
       [makeupUserId]
@@ -300,7 +300,7 @@ export async function settleOneTimeSubscription(makeupUserId: string): Promise<s
     // 找到用户最近的一次性订阅（未结算、未取消）
     const sel = await client.query(
       `SELECT id FROM public.makeup_user_subscriptions
-       WHERE makeup_user_id = $1 AND subscriptions_type = '1' AND COALESCE(is_settlement,0) = 0 AND COALESCE(is_cacelled,0) = 0
+       WHERE makeup_user_id = $1 AND subscriptions_type = '1' and pay_result = 'paid' AND COALESCE(is_settlement,0) = 0 AND COALESCE(is_cacelled,0) = 0
        ORDER BY created_at DESC
        LIMIT 1`,
       [makeupUserId]
@@ -312,6 +312,30 @@ export async function settleOneTimeSubscription(makeupUserId: string): Promise<s
       [id]
     );
     return id;
+  } finally {
+    client.release();
+  }
+}
+
+export async function insertSubscriptionRecord(params: {
+  makeupUserId: string;
+  subscriptionsType: '1' | '2' | '3';
+  price: number;
+  payResult: 'unpaid' | 'paid' | 'faild';
+  startTime?: string | null; // 'HH:MM:SS'
+  endTime?: string | null;   // 'HH:MM:SS'
+}): Promise<string> {
+  const { makeupUserId, subscriptionsType, price, payResult, startTime, endTime } = params;
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `INSERT INTO public.makeup_user_subscriptions
+         (makeup_user_id, subscriptions_type, price, start_time, end_time, is_cacelled, is_settlement, pay_result)
+       VALUES ($1, $2, $3, $4, $5, 0, 0, $6)
+       RETURNING id`,
+      [makeupUserId, subscriptionsType, price, startTime ?? null, endTime ?? null, payResult]
+    );
+    return res.rows[0].id as string;
   } finally {
     client.release();
   }
