@@ -174,13 +174,25 @@ export async function listPublicMakeupPhotos(params?: {
       `
       SELECT id, created_at, makeup_user_id, is_public, original_url, processed_url, status, failure_reason, completed_at
       FROM public.makeup_user_photo
-      WHERE is_public = 1
+      WHERE is_public = 1 AND status = 'completed'
       ORDER BY created_at DESC
       LIMIT $1 OFFSET $2
       `,
       [limit, offset]
     );
     return res.rows as MakeupUserPhoto[];
+  } finally {
+    client.release();
+  }
+}
+
+export async function countPublicMakeupPhotos(): Promise<number> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query(
+      `SELECT COUNT(1)::int AS cnt FROM public.makeup_user_photo WHERE is_public = 1 AND status = 'completed'`
+    );
+    return (res.rows[0]?.cnt as number) ?? 0;
   } finally {
     client.release();
   }

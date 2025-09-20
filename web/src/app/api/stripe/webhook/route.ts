@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { insertSubscriptionRecord } from "@/lib/db";
+import { insertSubscriptionRecord, insertUsageLog } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
             endTime: null,
             endAt: null,
           });
+          await insertUsageLog({ makeupUserId, action: 'pay', actionDataId: session.id });
           // 同步写入新字段（若已加 start_at/end_at 列，建议用单独 UPDATE 语句；这里保持 insert 方法兼容旧结构）
         } else if (mode === "subscription") {
           const type = typeMeta || '2';
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
             startAt: now.toISOString(),
             endAt: end.toISOString(),
           });
+          await insertUsageLog({ makeupUserId, action: 'pay', actionDataId: session.id });
         } else {
           throw new Error('Invalid checkout mode');
         }

@@ -49,6 +49,9 @@ export function ImageProcessor() {
   const [hasMore, setHasMore] = useState(true);
   const [subModalOpen, setSubModalOpen] = useState(false);
   const [subModalMsg, setSubModalMsg] = useState<string>("");
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerSrc, setViewerSrc] = useState("");
+  const [viewerAlt, setViewerAlt] = useState("");
 
   const mapReasonToMessage = (reason?: string) => {
     switch (reason) {
@@ -252,7 +255,8 @@ export function ImageProcessor() {
   const handleDownload = async () => {
     if (!processedResult) return;
     try {
-      const res = await fetch(processedResult);
+      const api = `/api/download?url=${encodeURIComponent(processedResult)}`;
+      const res = await fetch(api);
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -448,7 +452,15 @@ export function ImageProcessor() {
               key={image.id} 
               className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-sm border-pink-200 hover:border-pink-300"
             >
-              <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3 border-2 border-pink-100 relative">
+              <div
+                className="aspect-square rounded-lg overflow-hidden bg-muted mb-3 border-2 border-pink-100 relative cursor-zoom-in"
+                onClick={() => {
+                  if (!image.processedUrl) return;
+                  setViewerSrc(image.processedUrl);
+                  setViewerAlt('makeup insight result');
+                  setViewerOpen(true);
+                }}
+              >
               {image.processedUrl ? (
                 <ImageWithFallback
                 src={image.processedUrl}
@@ -488,6 +500,25 @@ export function ImageProcessor() {
           </div>
         )}
       </div>
+
+      {/* Image Viewer Modal */}
+      {viewerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setViewerOpen(false)} />
+          <div className="relative max-w-5xl w-[90%] max-h-[90vh] bg-white rounded-xl shadow-2xl p-3">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-black">
+              <ImageWithFallback
+                src={viewerSrc}
+                alt={viewerAlt}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="mt-3 flex justify-end">
+              <Button onClick={() => setViewerOpen(false)} className="bg-pink-500 hover:bg-pink-600 text-white">Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Subscription Modal */}
       {subModalOpen && (

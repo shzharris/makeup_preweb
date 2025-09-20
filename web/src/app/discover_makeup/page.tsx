@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
@@ -28,184 +28,40 @@ export function BeautyGallery() {
   const itemsPerPage = 20;
 
   const [imageDisplayStates, setImageDisplayStates] = useState<Record<string, 'original' | 'enhanced'>>({});
+  const [items, setItems] = useState<ProcessedImage[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerSrc, setViewerSrc] = useState("");
+  const [viewerAlt, setViewerAlt] = useState("");
 
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        setLoading(true);
+        setError(null);
+        const offset = (currentPage - 1) * itemsPerPage;
+        const res = await fetch(`/api/public/photos?limit=${itemsPerPage}&offset=${offset}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json() as { total?: number; items: ProcessedImage[] };
+        if (!cancelled) {
+          setItems(json.items || []);
+          setTotal((prev) => (currentPage === 1 ? (json.total ?? prev) : prev));
+        }
+      } catch (e) {
+        if (!cancelled) setError((e as Error).message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [currentPage]);
 
-  // Mock data for 50+ processed images
-  const allProcessedImages: ProcessedImage[] = [
-    {
-      id: "1",
-      originalUrl: "https://images.unsplash.com/photo-1605474082506-21d31d9d95e8?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1605474082506-21d31d9d95e8?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 14:30",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "2", 
-      originalUrl: "https://images.unsplash.com/photo-1590393802710-dbf451560939?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1590393802710-dbf451560939?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 13:45",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "3",
-      originalUrl: "https://images.unsplash.com/photo-1594646996739-9ea802039fe3?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1594646996739-9ea802039fe3?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 12:20",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "4",
-      originalUrl: "https://images.unsplash.com/photo-1623601903065-0d5b4ae594d4?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1623601903065-0d5b4ae594d4?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-15 11:15",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "5",
-      originalUrl: "https://images.unsplash.com/photo-1605813809066-0773a4e7e50e?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1605813809066-0773a4e7e50e?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 16:30",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "6",
-      originalUrl: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 15:45",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "7",
-      originalUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 14:20",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "8",
-      originalUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 13:30",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "9",
-      originalUrl: "https://images.unsplash.com/photo-1596815064285-45ed8a9c0463?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1596815064285-45ed8a9c0463?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 12:15",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "10",
-      originalUrl: "https://images.unsplash.com/photo-1586297135537-94bc9ba060aa?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1586297135537-94bc9ba060aa?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-14 11:45",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "11",
-      originalUrl: "https://images.unsplash.com/photo-1621784563330-caee0b138a00?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1621784563330-caee0b138a00?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 18:30",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "12",
-      originalUrl: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 17:15",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "13",
-      originalUrl: "https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 16:45",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "14",
-      originalUrl: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 15:20",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "15",
-      originalUrl: "https://images.unsplash.com/photo-1610484826967-09c5720778c7?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1610484826967-09c5720778c7?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 14:30",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "16",
-      originalUrl: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 13:45",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "17",
-      originalUrl: "https://images.unsplash.com/photo-1582992086267-a8a6c8c6e84c?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1582992086267-a8a6c8c6e84c?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 12:30",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "18",
-      originalUrl: "https://images.unsplash.com/photo-1595475038665-8b30a3e4c4ae?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1595475038665-8b30a3e4c4ae?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 11:15",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "19",
-      originalUrl: "https://images.unsplash.com/photo-1619194617062-5a61b698e548?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1619194617062-5a61b698e548?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-13 10:45",
-      status: 'completed',
-      isPublic: true
-    },
-    {
-      id: "20",
-      originalUrl: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=300&h=300&fit=crop",
-      processedUrl: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2",
-      processedAt: "2024-01-12 19:30",
-      status: 'completed',
-      isPublic: true
-    },
-    // Add more items for pagination demo
-    ...Array.from({ length: 35 }, (_, i) => ({
-      id: `${21 + i}`,
-      originalUrl: `https://images.unsplash.com/photo-160547408250${(i % 9) + 1}?w=300&h=300&fit=crop`,
-      processedUrl: `https://images.unsplash.com/photo-160547408250${(i % 9) + 1}?w=300&h=300&fit=crop&saturation=1.5&contrast=1.2`,
-      processedAt: `2024-01-${12 - Math.floor(i / 5)} ${10 + (i % 12)}:${15 + (i % 4) * 15}`,
-      status: 'completed' as const,
-      isPublic: true
-    }))
-  ];
-
-  const totalPages = Math.ceil(allProcessedImages.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentImages = allProcessedImages.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil((total || 0) / itemsPerPage);
+  const currentImages = items;
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -244,10 +100,11 @@ export function BeautyGallery() {
   };
 
   const toggleImageView = (imageId: string) => {
-    setImageDisplayStates(prev => ({
-      ...prev,
-      [imageId]: prev[imageId] === 'original' ? 'enhanced' : 'original'
-    }));
+    setImageDisplayStates((prev) => {
+      const current = prev[imageId] ?? 'original';
+      const next = current === 'original' ? 'enhanced' : 'original';
+      return { ...prev, [imageId]: next };
+    });
   };
 
   return (
@@ -256,7 +113,7 @@ export function BeautyGallery() {
       <div className="mb-12 text-center">
         <div className="flex items-center justify-center gap-3 mb-4">
           <h1 className="text-4xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-            Discover Makeup
+            Discover User's Makeup
           </h1>
         </div>
         <p className="text-muted-foreground text-lg">
@@ -266,33 +123,48 @@ export function BeautyGallery() {
 
       {/* Gallery Grid */}
       <div className="bg-gradient-to-br from-pink-50/50 to-purple-50/50 rounded-3xl p-8 mb-8">
+      {error && (
+          <div className="mb-4 text-red-600 text-center">{error}</div>
+        )}
+        {loading && (
+          <div className="mb-4 text-pink-600 text-center">Loading...</div>
+        )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {currentImages.map((image) => {
-            const currentView = imageDisplayStates[image.id] || 'enhanced';
-            const displayUrl = currentView === 'original' ? image.originalUrl : image.processedUrl;
+            const currentView = imageDisplayStates[image.id] || 'original';
+            const isEnhanced = currentView === 'enhanced';
             
             return (
               <Card 
                 key={image.id} 
                 className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-sm border-pink-200 hover:border-pink-300"
               >
-                <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-3 border-2 border-pink-100 relative">
-                  <ImageWithFallback
-                    src={displayUrl}
-                    alt={currentView === 'original' ? "Original photo" : "Enhanced beauty photo"}
-                    className="w-full h-full object-cover transition-all duration-300"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <Button
-                      size="sm"
-                      onClick={() => toggleImageView(image.id)}
-                      className="bg-pink-500 hover:bg-pink-600 text-white text-xs h-6 px-2 transition-all duration-200"
-                    >
-                      <EyeIcon className="w-2 h-2 mr-1" />
-                      View Results
-                    </Button>
+                <div
+                  className="aspect-square rounded-lg overflow-hidden bg-muted mb-3 border-2 border-pink-100 relative cursor-zoom-in"
+                  style={{ perspective: '1000px' }}
+                  onClick={() => {
+                    const currentSrc = isEnhanced ? image.processedUrl : image.originalUrl;
+                    setViewerSrc(currentSrc);
+                    setViewerAlt(isEnhanced ? "Enhanced beauty photo" : "Original photo");
+                    setViewerOpen(true);
+                  }}
+                >
+                  <div className="w-full h-full relative" style={{ transform: isEnhanced ? 'rotateY(180deg)' : 'rotateY(0deg)', transition: 'transform 0.6s', transformStyle: 'preserve-3d' }}>
+                    <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' as const }}>
+                      <ImageWithFallback
+                        src={image.originalUrl}
+                        alt="Original photo"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="absolute inset-0" style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' as const }}>
+                      <ImageWithFallback
+                        src={image.processedUrl}
+                        alt="Enhanced beauty photo"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                   </div>
-                
                 </div>
                 
                 <div className="space-y-2">
@@ -300,14 +172,23 @@ export function BeautyGallery() {
                     <ClockIcon className="w-3 h-3" />
                     <span>{image.processedAt}</span>
                   </div>
-                  
-                  <Badge 
-                    variant="secondary" 
-                    className="bg-green-100 text-green-700 border-green-200 w-full justify-center"
-                  >
-                    <CheckCircleIcon className="w-3 h-3 mr-1" />
-                    Public Gallery
-                  </Badge>
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge 
+                      variant="secondary" 
+                      className="bg-green-100 text-green-700 border-green-200"
+                    >
+                      <CheckCircleIcon className="w-3 h-3 mr-1" />
+                      Public
+                    </Badge>
+                    <Button
+                      size="sm"
+                      onClick={() => toggleImageView(image.id)}
+                      className="bg-pink-500 hover:bg-pink-600 text-white text-xs h-7 px-3 transition-all duration-200"
+                    >
+                      <EyeIcon className="w-3 h-3 mr-1" />
+                      {isEnhanced ? "View Original" : "View Results"}
+                    </Button>
+                  </div>
                 </div>
               </Card>
             );
@@ -374,6 +255,25 @@ export function BeautyGallery() {
             Next
             <ChevronRightIcon className="w-4 h-4 ml-1" />
           </Button>
+        </div>
+      )}
+
+      {/* Image Viewer Modal */}
+      {viewerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setViewerOpen(false)} />
+          <div className="relative max-w-5xl w-[90%] max-h-[90vh] bg-white rounded-xl shadow-2xl p-3">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-black">
+              <ImageWithFallback
+                src={viewerSrc}
+                alt={viewerAlt}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="mt-3 flex justify-end">
+              <Button onClick={() => setViewerOpen(false)} className="bg-pink-500 hover:bg-pink-600 text-white">Close</Button>
+            </div>
+          </div>
         </div>
       )}
 
