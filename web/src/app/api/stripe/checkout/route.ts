@@ -22,8 +22,12 @@ export async function POST(req: NextRequest) {
   if (!stripeSecret) return NextResponse.json({ error: "Missing STRIPE_SECRET_KEY" }, { status: 500 });
   const stripe = new Stripe(stripeSecret, { apiVersion: "2024-06-20" });
 
-  const success = successUrl || `${process.env.NEXTAUTH_URL || ""}/?checkout=success`;
-  const cancel = cancelUrl || `${process.env.NEXTAUTH_URL || ""}/?checkout=cancel`;
+  const baseUrl = process.env.NEXTAUTH_URL || '';
+  if (!baseUrl) {
+    return NextResponse.json({ error: "Missing NEXTAUTH_URL for redirect URLs" }, { status: 500 });
+  }
+  const success = successUrl || `${baseUrl}/?checkout=success`;
+  const cancel = cancelUrl || `${baseUrl}/?checkout=cancel`;
 
   const dbUserId = (session.user as unknown as { db_user_id?: string | null })?.db_user_id || "";
 
@@ -31,26 +35,34 @@ export async function POST(req: NextRequest) {
   if (dbUserId) metadata.makeup_user_id = dbUserId;
   if (subscriptionsType) metadata.subscriptions_type = subscriptionsType;
 
-  if (mode === "payment") {
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: success,
-      cancel_url: cancel,
-      metadata,
-    });
-    return NextResponse.json({ url: session.url });
-  } else {
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: success,
-      cancel_url: cancel,
-      metadata,
-    });
-    return NextResponse.json({ url: session.url });
+  try {
+    if (!priceId || !priceId.startsWith('price_')) {
+      return NextResponse.json({ error: "Invalid priceId" }, { status: 400 });
+    }
+    if (mode === "payment") {
+      const s = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: success,
+        cancel_url: cancel,
+        metadata,
+      });
+      return NextResponse.json({ url: s.url });
+    } else {
+      const s = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: success,
+        cancel_url: cancel,
+        metadata,
+      });
+      return NextResponse.json({ url: s.url });
+    }
+  } catch (err) {
+    console.error('[stripe][checkout]', err);
+    return NextResponse.json({ error: 'Stripe checkout failed', detail: String(err) }, { status: 500 });
   }
 }
 

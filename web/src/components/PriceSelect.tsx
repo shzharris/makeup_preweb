@@ -12,7 +12,7 @@ export function PriceSelect() {
       description: "Pay once. Use once.",
       price: "$0.99",
       period: "per use",
-      features: ["Single use access", "Basic features", "No commitment"],
+      features: ["Single use access", "Basic features", "All premium features"],
       buttonText: "Buy Now",
       buttonVariant: "outline" as const,
       popular: false
@@ -24,7 +24,7 @@ export function PriceSelect() {
       period: "month",
       originalPrice: "$19.99",
       savePercent: "50%",
-      features: ["Unlimited access", "All features", "24/7 customer support", "Priority updates"],
+      features: ["Unlimited access", "All premium features", "24/7 customer support", "Priority updates"],
       buttonText: "Subscribe Now",
       buttonVariant: "default" as const,
       popular: true,
