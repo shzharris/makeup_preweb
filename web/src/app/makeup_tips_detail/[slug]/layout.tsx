@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site";
 import { getBlogPostBySlug } from "@/lib/db";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const raw = params?.slug || "";
+export async function generateMetadata({ params }: { params: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const p = await params;
+  const slugParam = p?.slug;
+  const raw = Array.isArray(slugParam) ? (slugParam[0] || "") : (slugParam || "");
   const slug = raw ? decodeURIComponent(raw) : "";
   if (!slug) return {};
 
@@ -38,7 +40,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default function DetailLayout({ children }: { children: React.ReactNode }) {
+export default function DetailLayout({ children, params }: { children: React.ReactNode; params: Promise<Record<string, string | string[] | undefined>> }) {
+  void params;
   return children;
 }
 
