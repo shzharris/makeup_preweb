@@ -359,3 +359,200 @@ export async function insertSubscriptionRecord(params: {
 }
 
 
+// -----------------------------
+// Blog Posts
+// -----------------------------
+
+export type BlogPostRow = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  slug?: string | null;
+  read_minutes: number;
+  source: string | null;
+  preview_image_url: string | null;
+  content: string | null;
+  content_json: any | null; // eslint-disable-line @typescript-eslint/no-explicit-any
+  status: string;
+  description: string | null;
+};
+
+export async function listBlogPosts(params: { limit?: number; offset?: number; tag?: string }): Promise<BlogPostRow[]> {
+  const limit = params.limit ?? 15;
+  const offset = params.offset ?? 0;
+  const tag = params.tag?.trim();
+  const client = await pool.connect();
+  try {
+    let res;
+    try {
+      if (tag) {
+        res = await client.query(
+          `
+          SELECT p.id, p.created_at, p.title, p.slug, p.read_minutes, p.source, p.preview_image_url,
+                 p.content, NULL AS content_json, p.status, p.description
+          FROM public.blog_post p
+          JOIN public.blog_post_tag pt ON pt.post_id = p.id
+          JOIN public.blog_tag t ON t.id = pt.tag_id
+          WHERE p.status = 'publish' AND lower(t.name) = lower($3)
+          ORDER BY p.created_at DESC
+          LIMIT $1 OFFSET $2
+          `,
+          [limit, offset, tag]
+        );
+      } else {
+        res = await client.query(
+          `
+          SELECT id, created_at, title, slug, read_minutes, source, preview_image_url,
+                 content, NULL AS content_json, status, description
+          FROM public.blog_post
+          WHERE status = 'publish'
+          ORDER BY created_at DESC
+          LIMIT $1 OFFSET $2
+          `,
+          [limit, offset]
+        );
+      }
+      return res.rows as BlogPostRow[];
+    } catch (e: unknown) {
+      // 兼容尚未添加 slug 字段的老表结构：回退到不含 slug 的查询
+      if (tag) {
+        const fallback = await client.query(
+          `
+          SELECT p.id, p.created_at, p.title, NULL AS slug, p.read_minutes, p.source, p.preview_image_url,
+                 p.content, NULL AS content_json, p.status, p.description
+          FROM public.blog_post p
+          JOIN public.blog_post_tag pt ON pt.post_id = p.id
+          JOIN public.blog_tag t ON t.id = pt.tag_id
+          WHERE p.status = 'publish' AND lower(t.name) = lower($3)
+          ORDER BY p.created_at DESC
+          LIMIT $1 OFFSET $2
+          `,
+          [limit, offset, tag]
+        );
+        return fallback.rows as BlogPostRow[];
+      }
+      const fallback = await client.query(
+        `
+        SELECT id, created_at, title, NULL AS slug, read_minutes, source, preview_image_url,
+               content, NULL AS content_json, status, description
+        FROM public.blog_post
+        WHERE status = 'publish'
+        ORDER BY created_at DESC
+        LIMIT $1 OFFSET $2
+        `,
+        [limit, offset]
+      );
+      return fallback.rows as BlogPostRow[];
+    }
+  } finally {
+    client.release();
+  }
+}
+
+export async function countBlogPosts(params?: { tag?: string }): Promise<number> {
+  const client = await pool.connect();
+  try {
+    const tag = params?.tag?.trim();
+    let res;
+    if (tag) {
+      res = await client.query(
+        `SELECT COUNT(1)::int AS cnt
+         FROM public.blog_post p
+         JOIN public.blog_post_tag pt ON pt.post_id = p.id
+         JOIN public.blog_tag t ON t.id = pt.tag_id
+         WHERE p.status = 'publish' AND lower(t.name) = lower($1)`,
+        [tag]
+      );
+    } else {
+      res = await client.query(`SELECT COUNT(1)::int AS cnt FROM public.blog_post WHERE status = 'publish'`);
+    }
+    return (res.rows[0]?.cnt as number) ?? 0;
+  } finally {
+    client.release();
+  }
+}
+
+export type BlogPostDetail = BlogPostRow & {
+  tags: Array<{ id: string; name: string }>;
+};
+
+export async function getBlogPostById(id: string): Promise<BlogPostDetail | null> {
+  const client = await pool.connect();
+  try {
+    const postRes = await client.query(
+      `SELECT id, created_at, title, slug, read_minutes, source, preview_image_url,
+              content, NULL AS content_json, status, description
+       FROM public.blog_post
+       WHERE id = $1 LIMIT 1`,
+      [id]
+    );
+    const post = postRes.rows[0] as BlogPostRow | undefined;
+    if (!post) return null;
+
+    // tags via join if tables exist; if not, return empty
+    let tags: Array<{ id: string; name: string }> = [];
+    try {
+      const tagRes = await client.query(
+        `SELECT t.id, t.name
+         FROM public.blog_post_tag pt
+         JOIN public.blog_tag t ON t.id = pt.tag_id
+         WHERE pt.post_id = $1
+         ORDER BY t.name ASC`,
+        [id]
+      );
+      tags = tagRes.rows as Array<{ id: string; name: string }>;
+    } catch {
+      tags = [];
+    }
+
+    return { ...(post as BlogPostRow), tags } as BlogPostDetail;
+  } finally {
+    client.release();
+  }
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPostDetail | null> {
+  const client = await pool.connect();
+  try {
+    const postRes = await client.query(
+      `SELECT id, created_at, title, slug, read_minutes, source, preview_image_url,
+              content, NULL AS content_json, status, description
+       FROM public.blog_post
+       WHERE regexp_replace(lower(trim(slug)), '[_\s]+', '-', 'g') =
+             regexp_replace(lower(trim($1)),   '[_\s]+', '-', 'g')
+       LIMIT 1`,
+      [slug]
+    );
+    const post = postRes.rows[0] as BlogPostRow | undefined;
+    if (!post) return null;
+    let tags: Array<{ id: string; name: string }> = [];
+    try {
+      const tagRes = await client.query(
+        `SELECT t.id, t.name
+         FROM public.blog_post_tag pt
+         JOIN public.blog_tag t ON t.id = pt.tag_id
+         WHERE pt.post_id = $1
+         ORDER BY t.name ASC`,
+        [post.id]
+      );
+      tags = tagRes.rows as Array<{ id: string; name: string }>;
+    } catch {
+      tags = [];
+    }
+    return { ...(post as BlogPostRow), tags } as BlogPostDetail;
+  } finally {
+    client.release();
+  }
+}
+
+export async function listAllBlogTags(): Promise<Array<{ id: string; name: string }>> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query(`SELECT id, name FROM public.blog_tag ORDER BY name ASC`);
+    return res.rows as Array<{ id: string; name: string }>;
+  } finally {
+    client.release();
+  }
+}
+
