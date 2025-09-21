@@ -26,7 +26,7 @@ interface ProcessedImage {
   status: 'completed' | 'processing' | 'failed';
 }
 
-export function ImageProcessor() {
+function ImageProcessor() {
   const { status } = useSession();
   useEffect(() => {
     if (status === "unauthenticated") {
