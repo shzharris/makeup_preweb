@@ -6,9 +6,9 @@ export const dynamic = 'force-dynamic'
 
 export function generateMetadata({ searchParams }: { searchParams: { tag?: string } }): Metadata {
   const tag = searchParams?.tag || ''
-  const baseTitle = 'Blog'
+  const baseTitle = 'Makeup Tips'
   const title = tag ? `${tag} | ${baseTitle}` : baseTitle
-  const description = tag ? `Read blog posts about ${tag}.` : 'Browse our blog: curated makeup tutorials, tips and insights.'
+  const description = tag ? `Read makeup tips about ${tag}.` : 'Browse our makeup tips: curated makeup tutorials, tips and insights.'
   const canonical = tag ? `${siteUrl}/makeup_tips?tag=${encodeURIComponent(tag)}` : `${siteUrl}/makeup_tips`
   return {
     title,
