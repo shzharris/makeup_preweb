@@ -8,7 +8,7 @@ import crypto from "crypto";
 export const runtime = "nodejs";
 
 // 提示词（可按需修改）。目标：轻度美化、提亮、磨皮、提高清晰度并保持自然妆效。
-export const ENHANCE_PROMPT = `
+const ENHANCE_PROMPT = `
 You are a professional makeup retouching assistant.
 Please analyze the photos of my makeup look today. If you see any areas for improvement, please mark them in red and indicate how you can improve them. If my makeup look is perfect, please mark it "Perfect" in red. Thank you.
 Output only 1 image.
