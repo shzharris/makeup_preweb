@@ -23,7 +23,7 @@ interface ProcessedImage {
   isPublic?: boolean;
 }
 
-export function BeautyGallery() {
+function BeautyGallery() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
