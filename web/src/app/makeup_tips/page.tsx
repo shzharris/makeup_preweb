@@ -4,8 +4,10 @@ import MakeupTipsClient from './Client'
 
 export const dynamic = 'force-dynamic'
 
-export function generateMetadata({ searchParams }: { searchParams: { tag?: string } }): Metadata {
-  const tag = searchParams?.tag || ''
+export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const sp = await searchParams
+  const tagParam = sp?.tag
+  const tag = Array.isArray(tagParam) ? (tagParam[0] || '') : (tagParam || '')
   const baseTitle = 'Makeup Tips'
   const title = tag ? `${tag} | ${baseTitle}` : baseTitle
   const description = tag ? `Read makeup tips about ${tag}.` : 'Browse our makeup tips: curated makeup tutorials, tips and insights.'
@@ -23,7 +25,9 @@ export function generateMetadata({ searchParams }: { searchParams: { tag?: strin
   }
 }
 
-export default function Page({ searchParams }: { searchParams: { tag?: string } }) {
-  const tag = searchParams?.tag || ''
-  return <MakeupTipsClient initialTag={tag} />
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const sp = await searchParams
+  const tagParam = sp?.tag
+  const tag = Array.isArray(tagParam) ? (tagParam[0] || '') : (tagParam || '')
+  return <MakeupTipsClient initialTag={tag as string} />
 }
