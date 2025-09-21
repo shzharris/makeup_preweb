@@ -42,7 +42,7 @@ export function Navbar() {
           <Link href="/" className="hover:text-pink-500 transition-colors duration-200">Home</Link>
           <Link href="/makeup_analysis" className="hover:text-pink-500 transition-colors duration-200">Makeup Analysis</Link>
           <Link href="/discover_makeup" className="hover:text-pink-500 transition-colors duration-200">Discover Makeup</Link>
-          {/* <Link href="/makeup_tips" className="hover:text-pink-500 transition-colors duration-200">Makeup Tips</Link> */}
+          <Link href="/makeup_tips" className="hover:text-pink-500 transition-colors duration-200">Makeup Tips</Link>
         </nav>
         <div className="hidden sm:flex items-center gap-3">
           {status === "authenticated" ? (
@@ -98,7 +98,7 @@ export function Navbar() {
             <Link href="/" onClick={close} className="hover:text-gray-900">Home</Link>
             <Link href="/makeup_analysis" onClick={close} className="hover:text-gray-900">Makeup Analysis</Link>
             <Link href="/discover_makeup" onClick={close} className="hover:text-gray-900">Discover Makeup</Link>
-            {/* <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link> */}
+            <Link href="/makeup_tips" onClick={close} className="hover:text-gray-900">Makeup Tips</Link>
             <div className="pt-2 flex items-center gap-3">
               {status === "authenticated" ? (
                 <div className="flex items-center gap-3">

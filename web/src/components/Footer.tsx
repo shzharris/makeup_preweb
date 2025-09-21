@@ -19,7 +19,8 @@ export function Footer() {
     { name: "Home", href: "/" },
     { name: "Makeup Analysis", href: "/makeup_analysis" },
     { name: "Discover Makeup", href: "/discover_makeup" },
-    { name: "Price", href: "/?#pricing" }
+    { name: "Price", href: "/?#pricing" },
+    { name: "Makeup Tips", href: "/makeup_tips" }
   ];
 
   // const supportLinks = [

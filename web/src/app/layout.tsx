@@ -22,7 +22,8 @@ export const metadata: Metadata = {
     default: "Makeup Insight AI | Personalized Makeup Analysis",
     template: "%s | Makeup Insight AI",
   },
-  description: "Upload a selfie to detect makeup issues and get personalized suggestions. Mobile-friendly, privacy-first, and community-powered.",
+  keywords: ["makeup analysis ai", "makeup detection ai", "makeup insights ai", "makeup tips ai"],
+  description: "Upload a selfie to detect makeup flaws and receive personalized recommendations. We offer makeup analysis, makeup detection, makeup insights, and more. Just one photo of your makeup needs to be analyzed flawlessly by AI.",
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   openGraph: {
