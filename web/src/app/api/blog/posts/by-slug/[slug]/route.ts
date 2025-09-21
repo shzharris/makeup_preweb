@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getBlogPostBySlug } from "@/lib/db";
 
-export async function GET(_req: Request, context: { params: { slug: string } }) {
-  const slug = context.params.slug;
+export async function GET(_req: Request, { params }: any) {
+  const slug = params?.slug as string;
   if (!slug) return NextResponse.json({ error: 'missing slug' }, { status: 400 });
 
   const row = await getBlogPostBySlug(slug);
