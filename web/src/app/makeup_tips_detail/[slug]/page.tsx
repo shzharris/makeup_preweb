@@ -122,9 +122,10 @@ export default function Page() {
         {detail && (
           <div className="max-w-3xl mx-auto">
             {detail.content ? (
-              <div className="whitespace-pre-line text-foreground leading-relaxed">
-                {detail.content}
-              </div>
+              <div
+                className="text-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: detail.content }}
+              />
             ) : (
               <p className="text-muted-foreground">No content</p>
             )}
