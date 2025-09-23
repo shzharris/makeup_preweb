@@ -76,7 +76,7 @@ export default function Page() {
           )}
 
           <h1 className="text-4xl font-bold text-center mb-4 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            {detail?.title || (loading ? 'Loading...' : 'Not Found')}
+            {detail?.title || (loading ? 'Loading....' : 'Not Found')}
           </h1>
 
           {detail && (
