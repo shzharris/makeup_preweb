@@ -44,6 +44,16 @@ export default function Page() {
     return () => { cancelled = true; };
   }, [slug]);
 
+  // Initialize Google AdSense in-article ad when detail changes
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).adsbygoogle = (window as any).adsbygoogle || [];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      (window as any).adsbygoogle.push({});
+    } catch {}
+  }, [slug, detail]);
+
   if (!slug) return null;
 
   return (
@@ -132,6 +142,18 @@ export default function Page() {
           </div>
         )}
       </div>
+
+      {/* In-article Google AdSense */}
+      <div className="max-w-3xl mx-auto my-6">
+          <ins
+            className="adsbygoogle"
+            style={{ display: 'block', textAlign: 'center' as const }}
+            data-ad-layout="in-article"
+            data-ad-format="fluid"
+            data-ad-client="ca-pub-4704956339474632"
+            data-ad-slot="2901526001"
+          />
+        </div>
     </div>
   );
 }
