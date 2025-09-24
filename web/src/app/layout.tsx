@@ -71,6 +71,12 @@ export default function RootLayout({
             </Script>
           </>
         )}
+        <Script
+          id="adsbygoogle-init"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4704956339474632"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <script
           type="application/ld+json"
           suppressHydrationWarning
