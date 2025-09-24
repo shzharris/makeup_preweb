@@ -8,6 +8,12 @@ import { Badge } from "../../../components/ui/badge";
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 
+declare global {
+  interface Window {
+    adsbygoogle: unknown[];
+  }
+}
+
 type Detail = {
   id: string;
   title: string;
@@ -47,10 +53,10 @@ export default function Page() {
   // Initialize Google AdSense in-article ad when detail changes
   useEffect(() => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).adsbygoogle = (window as any).adsbygoogle || [];
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      (window as any).adsbygoogle.push({});
+      if (typeof window !== 'undefined') {
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
+      }
     } catch {}
   }, [slug, detail]);
 
