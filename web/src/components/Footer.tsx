@@ -136,7 +136,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center">
           <div className="flex items-center gap-2 text-sm text-muted-foreground ">
-            <span>© 2025 black flame DIGITAL Service Company Ltd.</span>
+            <span>© 2025 black flame DIGITAL Service Company LLC.</span>
             <div className="w-1 h-1 rounded-full bg-pink-400" />
             <span>All rights reserved</span>
           </div>
