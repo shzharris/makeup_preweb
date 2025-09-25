@@ -52,6 +52,7 @@ function ImageProcessor() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerSrc, setViewerSrc] = useState("");
   const [viewerAlt, setViewerAlt] = useState("");
+  const [analyzeErrorOpen, setAnalyzeErrorOpen] = useState(false);
 
   const mapReasonToMessage = (reason?: string) => {
     switch (reason) {
@@ -206,9 +207,25 @@ function ImageProcessor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ photoId, originalUrl: publicUrl, contentType: selectedFile.type }),
       });
-      if (!analyzeRes.ok) throw new Error("AI analyze failed");
-      const analyzeJson = await analyzeRes.json();
-      const processedUrlFromAI: string = analyzeJson.processedUrl || "";
+      let analyzeJson: unknown = null;
+      try {
+        analyzeJson = await analyzeRes.json();
+      } catch {}
+
+      const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+      const errorText = isRecord(analyzeJson) && typeof analyzeJson.error === 'string' ? analyzeJson.error as string : '';
+      if (!analyzeRes.ok) {
+        if (errorText.includes('Model did not return image data')) {
+          setAnalyzeErrorOpen(true);
+          return;
+        }
+        throw new Error(errorText || 'AI analyze failed');
+      }
+      if (errorText.includes('Model did not return image data')) {
+        setAnalyzeErrorOpen(true);
+        return;
+      }
+      const processedUrlFromAI: string = (isRecord(analyzeJson) && typeof analyzeJson.processedUrl === 'string') ? (analyzeJson.processedUrl as string) : "";
 
       // 4) Write usage log with real photo id
       fetch("/api/usage-log", {
@@ -533,6 +550,25 @@ function ImageProcessor() {
             <div className="flex gap-3 justify-end">
               <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-50" onClick={() => setSubModalOpen(false)}>Later</Button>
               <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white" onClick={() => { setSubModalOpen(false); window.location.href = '/?#pricing'; }}>Go to Subscription</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Analyze Error Modal */}
+      {analyzeErrorOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setAnalyzeErrorOpen(false)} />
+          <div className="relative w-full max-w-md mx-auto rounded-2xl p-6 shadow-xl bg-white border border-pink-200">
+            <div className="mb-3">
+              <h4 className="text-lg font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">提示</h4>
+            </div>
+            <div className="space-y-2 text-sm text-pink-800">
+              <p>1. 请上传正确的脸部照片。</p>
+              <p>2. 当前系统繁忙，请稍后重试。</p>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white" onClick={() => setAnalyzeErrorOpen(false)}>知道了</Button>
             </div>
           </div>
         </div>
