@@ -213,15 +213,9 @@ function ImageProcessor() {
       } catch {}
 
       const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
-      const errorText = isRecord(analyzeJson) && typeof analyzeJson.error === 'string' ? analyzeJson.error as string : '';
-      if (!analyzeRes.ok) {
-        if (errorText.includes('Model did not return image data')) {
-          setAnalyzeErrorOpen(true);
-          return;
-        }
-        throw new Error(errorText || 'AI analyze failed');
-      }
-      if (errorText.includes('Model did not return image data')) {
+      const errorText = isRecord(analyzeJson) && typeof analyzeJson.error === 'string' ? (analyzeJson.error as string) : '';
+      const hasApiError = !analyzeRes.ok || (typeof errorText === 'string' && errorText.trim().length > 0);
+      if (hasApiError) {
         setAnalyzeErrorOpen(true);
         return;
       }
@@ -253,6 +247,7 @@ function ImageProcessor() {
       });
     } catch (err) {
       console.error("[upload]", err);
+      setAnalyzeErrorOpen(true);
     } finally {
       setIsProcessing(false);
     }
