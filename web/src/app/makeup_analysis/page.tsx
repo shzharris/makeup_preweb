@@ -561,14 +561,14 @@ function ImageProcessor() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setAnalyzeErrorOpen(false)} />
           <div className="relative w-full max-w-md mx-auto rounded-2xl p-6 shadow-xl bg-white border border-pink-200">
             <div className="mb-3">
-              <h4 className="text-lg font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">提示</h4>
+              <h4 className="text-lg font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Notice</h4>
             </div>
             <div className="space-y-2 text-sm text-pink-800">
-              <p>1. 请上传正确的脸部照片。</p>
-              <p>2. 当前系统繁忙，请稍后重试。</p>
+              <p>1. Please upload a valid face photo.</p>
+              <p>2. The system is busy. Please try again later.</p>
             </div>
             <div className="mt-4 flex justify-end">
-              <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white" onClick={() => setAnalyzeErrorOpen(false)}>知道了</Button>
+              <Button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white" onClick={() => setAnalyzeErrorOpen(false)}>Got it</Button>
             </div>
           </div>
         </div>
