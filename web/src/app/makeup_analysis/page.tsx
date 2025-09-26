@@ -28,11 +28,6 @@ interface ProcessedImage {
 
 function ImageProcessor() {
   const { status } = useSession();
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      signIn("google", { callbackUrl: "/makeup_analysis" });
-    }
-  }, [status]);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -147,11 +142,19 @@ function ImageProcessor() {
   }, []);
 
   const handleUploadClick = () => {
+    if (status !== 'authenticated') {
+      signIn('google', { callbackUrl: '/makeup_analysis' });
+      return;
+    }
     fileInputRef.current?.click();
   };
 
   const handleProcess = async () => {
     if (!selectedFile) return;
+    if (status !== 'authenticated') {
+      signIn('google', { callbackUrl: '/makeup_analysis' });
+      return;
+    }
     setIsProcessing(true);
     setShowResult(false);
     try {
