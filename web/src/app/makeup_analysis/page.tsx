@@ -416,7 +416,7 @@ function ImageProcessor() {
                       <StarsIcon className="w-3 h-3 text-pink-400 animate-bounce" />
                     </div>
                   </div>
-                  <p>Creating magic...</p>
+                  <p>Makeup Insight ...</p>
                 </div>
               </div>
             )}
