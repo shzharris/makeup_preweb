@@ -245,6 +245,12 @@ function ImageProcessor() {
         }
         return [item, ...prev];
       });
+
+      // 5b) Clear upload state so user can re-run easily without clicking Reset
+      try { if (previewUrl) URL.revokeObjectURL(previewUrl); } catch {}
+      setSelectedFile(null);
+      setPreviewUrl("");
+      if (fileInputRef.current) { fileInputRef.current.value = ""; }
     } catch (err) {
       console.error("[upload]", err);
       setAnalyzeErrorOpen(true);
