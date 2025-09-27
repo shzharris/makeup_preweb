@@ -1,5 +1,5 @@
 ## 项目概述（Vercel + Next.js + Supabase + Google 登录）
-
+网站地址：https://www.makeupinsight.us/
 一个基于 Next.js 的 AI 妆容分析与处理平台，部署于 Vercel：
 - **流程**：Google 登录 -> 订阅校验 -> 上传/拍照 -> 记录上传日志并生成图片ID -> 调用 Google GenAI 模型 -> 展示处理结果 -> 后端记录消费 -> 公开/私密图库。
 - **关键点**：
