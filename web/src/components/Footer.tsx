@@ -104,6 +104,12 @@ export function Footer() {
                 <MailIcon className="w-4 h-4 text-pink-500" />
                 <span>support@makeupinsight.us</span>
               </li>
+              <li  className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Link href="https://seektool.ai/" title="SeekTool.ai Tools Directory" target="_blank" className="hover:text-pink-600 transition-colors text-sm flex items-center gap-2 group">
+                  <div className="w-1 h-1 rounded-full bg-pink-400 group-hover:bg-pink-600 transition-colors" />
+                  SeekTool.ai Tools Directory
+                </Link>
+              </li>
             </ul>
           </div>
 
